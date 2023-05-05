@@ -1,0 +1,65 @@
+version: '3.7'
+
+services:
+  timescaledb:
+    hostname: timescaledb
+    image: timescale/timescaledb-ha:pg14.7-ts2.10.3-all
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tsdb
+    volumes:
+      - timescaledb:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 12g
+        reservations:
+          memory: 2g
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    privileged: true
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}"
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - bunny-net
+
+  pgadmin4:
+    hostname: pgadmin4
+    image: dpage/pgadmin4:7.1
+    restart: "always"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "info.ia@sinopac.com"
+      PGADMIN_DEFAULT_PASSWORD: "bunnygood"
+      PGADMIN_CONFIG_SESSION_EXPIRATION_TIME: 365
+      PGADMIN_CONFIG_MAX_SESSION_IDLE_TIME: 60
+    volumes:
+      - pgadmin4-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}"
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - bunny-net
+
+volumes:
+  timescaledb:
+  pgadmin4-data:
+
+
+networks:
+  bunny-net:
+    external: true

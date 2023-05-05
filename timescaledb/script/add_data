@@ -1,0 +1,24 @@
+-- insert into accountdb.dealer.strategy(name, status) 
+-- values 
+-- ('法說會前主力蠢蠢欲動', true),
+-- ('注意股10日多', true),
+-- ('處置股10日多', true),
+-- ('開高動能強飆股_1', true),
+-- ('營收首次創新高', true),
+-- ('籌碼雷達5日多', true)
+
+select * from accountdb.dealer.strategy;
+
+
+-- insert into accountdb.public.quote_snapshots(dt, code, exchange, open, 
+-- high, low, close, tick_type, change_price, change_rate, change_type, average_price, volume,
+-- total_volume, amount, total_amount, yesterday_volume, buy_price, buy_volume, sell_price, sell_volume, volume_ratio)
+-- values
+    -- ('2023-05-08 10:48:01.372000', '2412', 'TSE', 126.5, 126.5, 126.0, 126.5, 'Buy',
+    -- 0.0, 0.0, 'Unchanged', 126.24, 1, 1076, 126500, 135835000, 2785.0, 126.0, 1481.0, 
+    -- 126.5, 1177, 0.39),
+    -- ('2023-05-08 10:47:52.646000', '6414', 'TSE', 260.0, 260.0, 257.0, 258.5, 'Sell', 
+    -- 2.0, 0.78, 'Up', 258.37, 1, 348, 258500, 89913000, 279.0, 258.5, 1.0, 259.0, 19, 1.25)
+
+
+select * from accountdb.public.quote_snapshots;

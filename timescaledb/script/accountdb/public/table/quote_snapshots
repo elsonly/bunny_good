@@ -1,0 +1,25 @@
+DROP TABLE IF EXISTS accountdb.public.quote_snapshots;
+CREATE TABLE accountdb.public.quote_snapshots(
+    dt timestamp,
+    code varchar(12) PRIMARY KEY,
+    exchange varchar(6),
+    open double precision,
+    high double precision,
+    low double precision,
+    close double precision,
+    tick_type varchar(4),
+    change_price double precision,
+    change_rate double precision,
+    change_type varchar(9),
+    average_price double precision,
+    volume int,
+    total_volume bigint,
+    amount bigint,
+    total_amount bigint,
+    yesterday_volume bigint,
+    buy_price double precision,
+    buy_volume int,
+    sell_price double precision,
+    sell_volume int,
+    volume_ratio double precision
+);

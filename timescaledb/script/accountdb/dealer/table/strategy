@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS accountdb.dealer.strategy;
+CREATE TABLE accountdb.dealer.strategy(
+    id SERIAL PRIMARY KEY,
+    name varchar,
+    add_date date DEFAULT CURRENT_DATE,
+    status boolean
+);
