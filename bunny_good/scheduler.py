@@ -3,6 +3,7 @@ import time
 from typing import Dict, TypedDict
 from datetime import datetime, timedelta
 import pandas as pd
+from loguru import logger
 
 from bunny_good.quote.quote_manager import QuoteManager
 from bunny_good.database.data_manager import DataManager
@@ -22,21 +23,27 @@ class Schedule(TypedDict):
 
 
 class Scheduler:
-    def __init__(self):
+    def __init__(self, verbose: bool = True):
         self.qm = QuoteManager()
-        self.dm = DataManager()
+        self.dm = DataManager(verbose)
         self.__active_schedule = False
-        self.schedules: Dict[str, Schedule] = {}
-        self.interval_snapshot = 5
+        self.schedules: Dict[ScheduleJobs, Schedule] = {}
 
     def _save2db(self, job: ScheduleJobs, df: pd.DataFrame):
         if job == ScheduleJobs.Snapshots:
-            pass
+            self.dm.save(
+                "public", "quote_snapshots", df, "upsert", conflict_cols=["code"]
+            )
 
     def register(self, schedule: Schedule):
-        self.schedules[schedule["name"]] = schedule
+        logger.info(f"register job: {schedule}")
+        self.schedules[schedule["job"]] = schedule
 
     def _job_snapshots(self):
+        if datetime.weekday() >= 5:
+            return
+        if datetime.utcnow().hour > 15:
+            return
         codes = self.qm.get_market_codes()
         rng = 500
         for idx in range(0, len(codes), rng):
@@ -49,18 +56,16 @@ class Scheduler:
     def run(self):
         self.__active_schedule = True
         while self.__active_schedule:
-            cur_dt = datetime.now()
-            for name, schedule in self.schedules.items():
-                if schedule.get("prev_dt"):
-                    if schedule["prev_dt"] + schedule["interval"] >= cur_dt:
-                        if ScheduleJobs.Snapshots:
-                            self._job_snapshots()
+            cur_dt = datetime.utcnow()
+            for job, schedule in self.schedules.items():
+                if cur_dt >= schedule["next_dt"]:
+                    logger.info(f"dispatch job: {job}")
+                    if job == ScheduleJobs.Snapshots:
+                        self._job_snapshots()
+                        schedule["prev_dt"] = cur_dt
+                        schedule["next_dt"] = cur_dt + schedule["interval"]
 
             time.sleep(0.1)
 
     def __del__(self):
         self.__active_schedule = False
-
-
-if __name__ == "__main__":
-    scheduler = Scheduler()

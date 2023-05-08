@@ -9,3 +9,15 @@ down-timescaledb:
 
 up-metabase:
 	docker-compose -f metabase/docker-compose.yml up -d
+
+image-base:
+	docker build -f Dockerfile.base -t bunny_good:base .
+
+image:
+	docker-compose build --no-cache
+
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down

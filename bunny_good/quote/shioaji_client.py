@@ -2,8 +2,9 @@ from shioaji.contracts import Contract
 import shioaji as sj
 import pandas as pd
 import time
+from datetime import datetime, timedelta
 from typing import List
-from threading import Lock
+from threading import Lock, Thread
 from loguru import logger
 from functools import wraps
 
@@ -32,9 +33,42 @@ class ShioajiClient:
         self.__api_secret = api_secret
         self.simulation = simulation
         self.api = sj.Shioaji(simulation=simulation)
-        # self.__lock = Lock()
         self.contracts: Dict[str, Contract] = {}
         self.snapshot_collection = {}
+
+        self.__thread = Thread(target=self._backgroud_tasks)
+        self.__thread.setDaemon(True)
+        self.__lock = Lock()
+        self._active_backgroud_tasks = False
+        self.connected = False
+
+        self.__thread.start()
+
+    def __del__(self):
+        self._active_backgroud_tasks = False
+        if self.__thread.is_alive():
+            self.__thread.join(timeout=5)
+        if self.connected:
+            self.api.logout()
+
+    def _backgroud_tasks(self):
+        logger.info("start backgroud tasks")
+        self._active_backgroud_tasks = True
+        cur_dt = datetime.utcnow()
+        # 8 am
+        next_reconnect_dt = (cur_dt + timedelta(days=1)).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+
+        while self._active_backgroud_tasks:
+            cur_dt = datetime.now()
+            if cur_dt > next_reconnect_dt:
+                if self.connected:
+                    self.logout()
+                self.login()
+                next_reconnect_dt += timedelta(days=1)
+
+            time.sleep(15)
 
     def login(self):
         self.api.login(
@@ -50,9 +84,11 @@ class ShioajiClient:
             for name, iter_contract in self.api.Contracts
             for code, contract in iter_contract._code2contract.items()
         }
+        self.connected = True
 
     def logout(self):
         self.api.logout()
+        self.connected = False
 
     def subscribe(self):
         pass
@@ -67,7 +103,8 @@ class ShioajiClient:
         df = pd.DataFrame([x.__dict__ for x in snapshots])
         if df.empty:
             return pd.DataFrame()
-        df.ts = pd.to_datetime(df.ts)
+        df["dt"] = pd.to_datetime(df.ts)
+        df.drop(columns=["ts"], inplace=True)
         return df
 
     def get_market_codes(self) -> List[str]:
