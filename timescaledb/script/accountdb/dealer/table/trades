@@ -5,6 +5,7 @@ CREATE TABLE accountdb.dealer.trades(
     account_id varchar(7),
     strategy INT,
     order_id varchar(10),
+    order_type varchar(3),
     seqno varchar(20),
     security_type char(1), -- S, F
     trade_date date,
