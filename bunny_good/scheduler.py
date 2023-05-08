@@ -40,9 +40,9 @@ class Scheduler:
         self.schedules[schedule["job"]] = schedule
 
     def _job_snapshots(self):
-        if datetime.weekday() >= 5:
+        if datetime.utcnow().weekday() >= 5:
             return
-        if datetime.utcnow().hour > 15:
+        if datetime.utcnow().hour >= 7:
             return
         codes = self.qm.get_market_codes()
         rng = 500
@@ -59,7 +59,6 @@ class Scheduler:
             cur_dt = datetime.utcnow()
             for job, schedule in self.schedules.items():
                 if cur_dt >= schedule["next_dt"]:
-                    logger.info(f"dispatch job: {job}")
                     if job == ScheduleJobs.Snapshots:
                         self._job_snapshots()
                         schedule["prev_dt"] = cur_dt
