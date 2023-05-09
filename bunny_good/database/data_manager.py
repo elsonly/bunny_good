@@ -3,7 +3,7 @@ from typing import Dict, List
 import pandas as pd
 from loguru import logger
 
-from .tsdb_client import TSDBClient
+from bunny_good.database.tsdb_client import TSDBClient
 from bunny_good.config import Config
 
 

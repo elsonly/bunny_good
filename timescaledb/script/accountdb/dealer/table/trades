@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS accountdb.dealer.trades;
 CREATE TABLE accountdb.dealer.trades(
+    id BIGSERIAL PRIMARY KEY,
     trader_id varchar(10),
     broker_id varchar(7),
     account_id varchar(7),
