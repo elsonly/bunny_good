@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  bunny_good:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bunny_good:latest
+    command: python -m bunny_good
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}"
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - bunny-net
+
+networks:
+  bunny-net:
+    external: true

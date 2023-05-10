@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS accountdb.dealer.orders;
 CREATE TABLE accountdb.dealer.orders(
+    id BIGSERIAL PRIMARY KEY,
     trader_id varchar(10),
     broker_id varchar(7),
     account_id varchar(7),
@@ -15,9 +16,9 @@ CREATE TABLE accountdb.dealer.orders(
     order_type varchar(3), -- ROD, IOC, FOK
     price_type varchar(3), -- LMT, MKT, MOP
     status varchar(10),
-    CONSTRAINT fk_sport_id
-        FOREIGN KEY(sport_id)
-        REFERENCES sports(sport_id)
+    CONSTRAINT fk_strategy_id
+        FOREIGN KEY(strategy)
+        REFERENCES dealer.strategy(id)
 );
 CREATE INDEX idx_orders_date ON accountdb.dealer.orders(order_date);
 CREATE INDEX idx_orders_date_strategy ON accountdb.dealer.orders(order_date, strategy);

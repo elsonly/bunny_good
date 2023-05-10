@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 
+if not os.path.exists(".env"):
+    raise Exception("please provide .env")
 load_dotenv()
 
 

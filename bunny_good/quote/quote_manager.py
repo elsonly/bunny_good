@@ -14,6 +14,7 @@ class QuoteManager:
             api_secret=Config.SHIOAJI_SECRET,
             simulation=False,
         )
+        self.cli.login()
 
     def get_market_codes(self) -> List[str]:
         return self.cli.get_market_codes()
