@@ -3,5 +3,8 @@ CREATE TABLE accountdb.dealer.strategy(
     id SERIAL PRIMARY KEY,
     name varchar,
     add_date date DEFAULT CURRENT_DATE,
-    status boolean
+    status boolean,
+    leverage_ratio double precision,
+    expected_mdd double precision,
+    expected_daily_return double precision
 );
