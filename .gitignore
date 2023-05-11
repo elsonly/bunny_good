@@ -4,6 +4,7 @@ XQ_output/*
 .env
 doc
 *.log
+test_fifo
 
 # pipenv
 Pipfile
