@@ -1,0 +1,15 @@
+deployments:
+- name: cmoney
+  version: 1
+  tags: [cmoney, twse]
+  description: hello
+  schedule:
+    cron: 0 10 * * *
+    timezone: Asia/Taipei
+
+  entrypoint: ./daily_stock_price.py:daily_stock_price
+  parameters: {}
+  work_pool:
+    name: local-work
+    work_queue_name: null
+    job_variables: {}
