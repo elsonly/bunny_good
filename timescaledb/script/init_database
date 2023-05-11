@@ -8,3 +8,7 @@ CREATE DATABASE accountdb;
 CREATE USER chiubj with encrypted password 'bunnygood';
 grant all PRIVILEGES on database accountdb to chiubj;
 CREATE SCHEMA dealer;
+-- airflow
+CREATE DATABASE airflow;
+CREATE USER airflow with encrypted password 'airflow';
+grant all PRIVILEGES on database airflow to airflow;

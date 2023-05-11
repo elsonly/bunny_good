@@ -10,6 +10,12 @@ down-timescaledb:
 up-metabase:
 	docker-compose -f metabase/docker-compose.yml up -d
 
+up-airflow:
+	docker-compose -f airflow/docker-compose.yml up -d
+
+down-airflow:
+	docker-compose -f airflow/docker-compose.yml down
+
 image-base:
 	docker build -f Dockerfile.base -t bunny_good:base .
 
