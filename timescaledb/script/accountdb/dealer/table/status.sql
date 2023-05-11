@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS accountdb.dealer.orders;
+DROP TABLE IF EXISTS accountdb.dealer.status;
 CREATE TABLE accountdb.dealer.status(
     strategy INT,
     security_type char(1), -- S, F
