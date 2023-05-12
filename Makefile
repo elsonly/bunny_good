@@ -27,3 +27,7 @@ up:
 
 down:
 	docker-compose down
+
+
+deploy-prefect-flows:
+	python -m bunny_good.services.prefect_agent

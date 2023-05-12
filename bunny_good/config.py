@@ -17,6 +17,9 @@ class BaseConfig:
     DB_DATABASE = ""
     SHIOAJI_API_KEY = ""
     SHIOAJI_SECRET = ""
+    GMAIL_MAIL = ""
+    GMAIL_API_KEY = ""
+    GMAIL_ALERT_TO = ""
 
 
 class ProductionConfig(BaseConfig):
@@ -30,6 +33,9 @@ class ProductionConfig(BaseConfig):
     DB_DATABASE = os.environ.get("DB_DATABASE")
     SHIOAJI_API_KEY = os.environ.get("SHIOAJI_API_KEY")
     SHIOAJI_SECRET = os.environ.get("SHIOAJI_SECRET")
+    GMAIL_MAIL = os.environ.get("GMAIL_MAIL")
+    GMAIL_API_KEY = os.environ.get("GMAIL_API_KEY")
+    GMAIL_ALERT_TO = os.environ.get("GMAIL_ALERT_TO")
 
 
 class DevelopmentConfig(BaseConfig):
@@ -41,12 +47,16 @@ class DevelopmentConfig(BaseConfig):
     DB_DATABASE = os.environ.get("DB_DATABASE")
     SHIOAJI_API_KEY = os.environ.get("SHIOAJI_API_KEY")
     SHIOAJI_SECRET = os.environ.get("SHIOAJI_SECRET")
+    GMAIL_MAIL = os.environ.get("GMAIL_MAIL")
+    GMAIL_API_KEY = os.environ.get("GMAIL_API_KEY")
+    GMAIL_ALERT_TO = os.environ.get("GMAIL_ALERT_TO")
+
 
 if os.environ.get("ENV", "dev") == "dev":
     Config = DevelopmentConfig()
 
 elif os.environ.get("ENV") == "prod":
     Config = ProductionConfig()
-    
+
 else:
     Config = BaseConfig()

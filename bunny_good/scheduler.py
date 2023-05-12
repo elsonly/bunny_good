@@ -31,9 +31,7 @@ class Scheduler:
 
     def _save2db(self, job: ScheduleJobs, df: pd.DataFrame):
         if job == ScheduleJobs.Snapshots:
-            self.dm.save(
-                "public", "quote_snapshots", df, "upsert", conflict_cols=["code"]
-            )
+            self.dm.save("public.quote_snapshots", df, "upsert", conflict_cols=["code"])
 
     def register(self, schedule: Schedule):
         logger.info(f"register job: {schedule}")

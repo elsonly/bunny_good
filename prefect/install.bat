@@ -4,5 +4,5 @@ echo %WORK_DIR%
 
 @REM conda create -n prefect-env python=3.8
 call activate prefect-env
-pip install -r requirements.txt
+pip install prefect==2.10.8
 prefect config set PREFECT_API_URL=http://128.110.25.99:4200/api

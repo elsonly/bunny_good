@@ -1,4 +1,0 @@
-{
-  "Call API": "api_flow.py:call_api",
-  "my-flow": "api_flow.py:my_flow"
-}

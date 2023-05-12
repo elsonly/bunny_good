@@ -88,7 +88,6 @@ class DataManager:
 
     def save(
         self,
-        schema: str,
         table: str,
         df: pd.DataFrame,
         method: str,
@@ -101,40 +100,39 @@ class DataManager:
         """
         if df.empty:
             return
-        _table = f"{schema}.{table}"
         if self.verbose:
-            logger.info(f"save {_table} | size: {len(df)}")
+            logger.info(f"save {table} | size: {len(df)}")
 
         result = 1
         if method == "direct":
-            result = self.cli.execute_values_df(df, _table)
+            result = self.cli.execute_values_df(df, table)
 
         elif method == "if_not_exists":
-            if not self._check_exists(table=_table, conditions=conditions):
-                result = self.cli.execute_values_df(df, _table)
+            if not self._check_exists(table=table, conditions=conditions):
+                result = self.cli.execute_values_df(df, table)
             else:
                 result = 0
                 logger.warning("data already exists | skip insert")
 
         elif method == "timeseries":
-            max_dt = self.get_max_datetime(_table, conditions, time_col)
+            max_dt = self.get_max_datetime(table, conditions, time_col)
             if max_dt:
                 df_save = df.loc[df[time_col] > max_dt]
             else:
                 df_save = df
-            result = self.cli.execute_values_df(df_save, _table)
+            result = self.cli.execute_values_df(df_save, table)
 
         elif method == "upsert":
             if not conflict_cols:
                 raise Exception("conflict_cols is required")
             result = self.cli.excute_batch_upsert_df(
-                df, _table, conflict_cols=conflict_cols
+                df, table, conflict_cols=conflict_cols
             )
 
-        if self.verbose:
-            if result == 1:
-                raise Exception(f"save {_table} | failed")
-            elif isinstance(result, str) and "Error" in result:
-                raise Exception(f"save {_table} | failed", result)
-            else:
-                logger.info(f"save {_table} | success")
+        if result == 1:
+            raise Exception(f"save {table} | failed")
+        elif isinstance(result, str) and "Error" in result:
+            raise Exception(f"save {table} | failed", result)
+        else:
+            if self.verbose:
+                logger.info(f"save {table} | success")

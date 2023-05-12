@@ -1,0 +1,22 @@
+drop function if exists ft_get_table_description;
+create or replace function ft_get_table_description(
+    in_table_name name
+) returns table(
+    column_name varchar,
+    data_type varchar,
+    description text
+)
+
+AS $$ BEGIN RETURN QUERY
+
+select c.column_name::varchar,
+    c.data_type::varchar,
+    pgd.description
+from information_schema.columns c
+left join pg_catalog.pg_class pgc on pgc.relname = c.table_name
+left join pg_description pgd on pgd.objsubid = c.ordinal_position
+    and pgd.objoid = pgc.oid
+where c.table_name = in_table_name;
+
+END;
+$$ LANGUAGE plpgsql;

@@ -12,3 +12,5 @@ CREATE SCHEMA dealer;
 CREATE DATABASE airflow;
 CREATE USER airflow with encrypted password 'airflow';
 grant all PRIVILEGES on database airflow to airflow;
+-- tsdb
+CREATE SCHEMA cmoney;
