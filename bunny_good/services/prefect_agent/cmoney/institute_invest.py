@@ -49,7 +49,11 @@ def get_workbook_path() -> Path:
         wb_path = Path(__file__).parent.joinpath(f"docs/{name}.xlsm")
     except:
         wb_path = (
-            Path().absolute().joinpath("bunny_good/services/prefect_agent/cmoney/docs/institute_invest.xlsm")
+            Path()
+            .absolute()
+            .joinpath(
+                "bunny_good/services/prefect_agent/cmoney/docs/institute_invest.xlsm"
+            )
         )
     return wb_path
 
@@ -165,7 +169,12 @@ def save2db(collection: Dict[str, pd.DataFrame]):
         )
 
 
-@flow(retries=2, retry_delay_seconds=30, task_runner=SequentialTaskRunner(), on_failure=[flow_error_handle])
+@flow(
+    retries=2,
+    retry_delay_seconds=30,
+    task_runner=SequentialTaskRunner(),
+    on_failure=[flow_error_handle],
+)
 def flow_institute_invest():
     logger = get_run_logger()
     end_date = pd.Timestamp.today()

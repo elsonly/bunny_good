@@ -1,4 +1,9 @@
 XQ_output/*
+# docs
+~$*
+*_hist.xlsx
+*.xlsx
+
 
 .vscode
 .env

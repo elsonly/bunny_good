@@ -136,3 +136,11 @@ class DataManager:
         else:
             if self.verbose:
                 logger.info(f"save {table} | success")
+
+    def get_twse_trading_dates(self) -> List[dt.date]:
+        sql = "select * from (select distinct tdate from tsdb.cmoney.institute_invest) t0 order by tdate"
+        df = self.cli.execute_query(sql, out_type="df")
+        if df.empty:
+            return []
+        tdates = df["tdate"].tolist()
+        return tdates

@@ -32,5 +32,5 @@ SET (
     );
 SELECT add_compression_policy('tsdb.cmoney.daily_price', INTERVAL '7 days');
 
--- select * from tsdb.cmoney.daily_price where code = '1102' order by tdate desc;
+-- select * from tsdb.cmoney.daily_price where code = '2330' order by tdate desc;
 -- delete from tsdb.cmoney.daily_price where tdate > '2023-01-01';

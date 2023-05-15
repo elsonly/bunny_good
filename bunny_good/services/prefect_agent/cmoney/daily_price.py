@@ -2,7 +2,7 @@ from prefect import flow, task, get_run_logger
 from prefect.task_runners import SequentialTaskRunner
 import xlwings as xw
 import pandas as pd
-from typing import Dict
+from typing import Dict, List
 from pathlib import Path
 
 from bunny_good.database.data_manager import DataManager
@@ -23,7 +23,22 @@ def get_workbook_path() -> Path:
 
 
 @task(retries=3, retry_delay_seconds=3)
-def update_workbook(start_date: str, end_date: str):
+def update_workbook(
+    start_date: pd.Timestamp = None,
+    end_date: pd.Timestamp = None,
+    periods: List[pd.Timestamp] = [],
+    validate_date: bool = False,
+):
+    def get_validate_date(tdate: pd.Timestamp) -> pd.Timestamp:
+        if not validate_date or not periods:
+            return tdate
+
+        while tdate <= periods[-1]:
+            if tdate in periods:
+                return tdate
+            tdate += pd.offsets.Day()
+        return None
+
     logger = get_run_logger()
     items = {
         "開盤價": "日收盤表排行",
@@ -55,13 +70,12 @@ def update_workbook(start_date: str, end_date: str):
         logger.info("update request items...")
         idx = 3
         for item, table in items.items():
-            req_date = start_date
-            while req_date <= end_date:
+            req_date = get_validate_date(start_date)
+            while req_date and req_date <= end_date:
                 sh.range(f"A{idx}").value = f"{table}.{item}"
-                sh.range(f"B{idx}").value = req_date
-                req_date = (pd.to_datetime(req_date) + pd.offsets.Day()).strftime(
-                    "%Y%m%d"
-                )
+                sh.range(f"B{idx}").value = req_date.strftime("%Y%m%d")
+                req_date = get_validate_date(req_date + pd.offsets.Day())
+
                 idx += 1
 
         logger.info("update data...")
@@ -108,6 +122,8 @@ def process_data() -> Dict[str, pd.DataFrame]:
 
         tmp.dropna(how="all", axis=0, inplace=True)
         tmp.rename(columns=col_map, inplace=True)
+        if tmp.empty:
+            continue
         tmp["tdate"] = pd.to_datetime(tmp.index)
         tmp["code"] = code
 
@@ -156,23 +172,41 @@ def get_last_date() -> pd.Timestamp:
         return pd.to_datetime(last_date)
 
 
-@flow(retries=2, retry_delay_seconds=30, task_runner=SequentialTaskRunner(), on_failure=flow_error_handle)
+@task
+def get_trading_dates() -> List[pd.Timestamp]:
+    dm = DataManager(verbose=False)
+    tdates = [pd.to_datetime(x) for x in dm.get_twse_trading_dates()]
+    return tdates
+
+
+@flow(
+    retries=2,
+    retry_delay_seconds=30,
+    task_runner=SequentialTaskRunner(),
+    on_failure=flow_error_handle,
+)
 def flow_daily_price_history():
     logger = get_run_logger()
     today = pd.Timestamp.today()
     start_date = get_last_date() + pd.offsets.Day()
+    trading_dates = get_trading_dates()
     while start_date <= today:
         end_date = start_date + pd.offsets.MonthEnd()
         if end_date >= today:
             end_date = today
         logger.info(f"{start_date} ~ {end_date}")
-        update_workbook(start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
+        update_workbook(start_date, end_date, periods=trading_dates, validate_date=True)
         collections = process_data()
         save2db(collections)
         start_date += pd.offsets.MonthBegin()
 
 
-@flow(retries=2, retry_delay_seconds=30, task_runner=SequentialTaskRunner(), on_failure=flow_error_handle)
+@flow(
+    retries=2,
+    retry_delay_seconds=30,
+    task_runner=SequentialTaskRunner(),
+    on_failure=flow_error_handle,
+)
 def flow_daily_price():
     logger = get_run_logger()
     end_date = pd.Timestamp.today()
