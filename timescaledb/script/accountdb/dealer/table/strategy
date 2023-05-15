@@ -7,5 +7,6 @@ CREATE TABLE accountdb.dealer.strategy(
     leverage_ratio double precision,
     expected_mdd double precision,
     expected_daily_return double precision,
-    holding_period int
+    holding_period int,
+    order_low_ratio double precision
 );
