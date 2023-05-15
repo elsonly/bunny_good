@@ -126,10 +126,10 @@ if __name__ == "__main__":
         "tsdb",
         "cmoney",
         "institute_dealer",
-        [   
+        [
             ("tdate", "date NOT NULL", "", "trading date"),
             ("code", "varchar(10) NOT NULL", "", "stock code"),
-            ("buy", "double precision", "日自營商進出排行", "自營商買張"), 
+            ("buy", "double precision", "日自營商進出排行", "自營商買張"),
             ("sell", "double precision", "日自營商進出排行", "自營商賣張"),
             ("net", "double precision", "日自營商進出排行", "自營商買賣超"),
             ("buy_self", "double precision", "日自營商進出排行", "自營商買張(自行買賣)"),

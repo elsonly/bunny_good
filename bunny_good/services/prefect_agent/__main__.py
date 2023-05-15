@@ -1,7 +1,7 @@
 from prefect.deployments import Deployment
 from prefect.server.schemas.schedules import CronSchedule
 
-from bunny_good.services.prefect_agent import cmoney
+from bunny_good.services.prefect_agent import cmoney, sino
 
 deployments = {}
 deployments[0] = Deployment.build_from_flow(
@@ -30,6 +30,16 @@ deployments[1] = Deployment.build_from_flow(
     schedule=(CronSchedule(cron="5 0 * * *", timezone="Asia/Taipei")),
     is_schedule_active=True,
     tags=["twse", "cmoney"],
+    infra_overrides={"env": {}},
+    work_pool_name="local-work",
+)
+deployments[2] = Deployment.build_from_flow(
+    flow=sino.flow_contracts,
+    name="sino",
+    version=1,
+    schedule=(CronSchedule(cron="5 8 * * *", timezone="Asia/Taipei")),
+    is_schedule_active=True,
+    tags=["twse", "sino"],
     infra_overrides={"env": {}},
     work_pool_name="local-work",
 )

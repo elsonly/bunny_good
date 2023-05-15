@@ -34,7 +34,7 @@ def update_workbook(
     def get_validate_date(tdate: pd.Timestamp) -> pd.Timestamp:
         if not validate_date or not periods:
             return tdate
-        if  tdate < pd.to_datetime("1994-01-06"):
+        if tdate < pd.to_datetime("1994-01-06"):
             return tdate
 
         while tdate <= periods[-1]:
@@ -62,7 +62,7 @@ def update_workbook(
         "自營商賣均價": "日自營商進出排行",
         "自營商持股比率(%)": "日自營商進出排行",
         "自營商持股市值(百萬)": "日自營商進出排行",
-        "自營商持股成本": "日自營商進出排行"
+        "自營商持股成本": "日自營商進出排行",
     }
     wb_path = get_workbook_path()
     logger.info(wb_path)
@@ -121,7 +121,7 @@ def process_data() -> Dict[str, pd.DataFrame]:
         "自營商賣均價": "sell_avg_prc",
         "自營商持股比率(%)": "holding_ratio",
         "自營商持股市值(百萬)": "holding_mkt_value",
-        "自營商持股成本": "holding_avg_prc"
+        "自營商持股成本": "holding_avg_prc",
     }
 
     for code in df.columns[4:]:
@@ -154,6 +154,7 @@ def save2db(collection: Dict[str, pd.DataFrame]):
             conditions={"code": code},
         )
 
+
 @task(name="task-institute_dealer-get_last_date")
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
@@ -162,6 +163,7 @@ def get_last_date() -> pd.Timestamp:
         return pd.to_datetime("1994-01-06")
     else:
         return pd.to_datetime(last_date)
+
 
 @task(name="task-institute_dealer-get_trading_dates")
 def get_trading_dates() -> List[pd.Timestamp]:

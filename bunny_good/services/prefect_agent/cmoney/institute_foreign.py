@@ -34,7 +34,7 @@ def update_workbook(
     def get_validate_date(tdate: pd.Timestamp) -> pd.Timestamp:
         if not validate_date or not periods:
             return tdate
-        if  tdate < pd.to_datetime("1994-01-06"):
+        if tdate < pd.to_datetime("1994-01-06"):
             return tdate
 
         while tdate <= periods[-1]:
@@ -148,8 +148,8 @@ def process_data() -> Dict[str, pd.DataFrame]:
             continue
         tmp["tdate"] = pd.to_datetime(tmp.index)
         tmp["code"] = code
-        tmp['reason_for_chg'] = tmp['reason_for_chg'].astype(str)
-        tmp.loc[tmp['reason_for_chg']=="nan", "reason_for_chg"] = None 
+        tmp["reason_for_chg"] = tmp["reason_for_chg"].astype(str)
+        tmp.loc[tmp["reason_for_chg"] == "nan", "reason_for_chg"] = None
 
         collection[code] = tmp
 
@@ -168,6 +168,7 @@ def save2db(collection: Dict[str, pd.DataFrame]):
             conditions={"code": code},
         )
 
+
 @task(name="task-institute_foreign-get_last_date")
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
@@ -176,6 +177,7 @@ def get_last_date() -> pd.Timestamp:
         return pd.to_datetime("1994-01-06")
     else:
         return pd.to_datetime(last_date)
+
 
 @task(name="task-institute_foreign-get_trading_dates")
 def get_trading_dates() -> List[pd.Timestamp]:
