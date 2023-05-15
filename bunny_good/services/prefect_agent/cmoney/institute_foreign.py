@@ -34,7 +34,7 @@ def update_workbook(
     def get_validate_date(tdate: pd.Timestamp) -> pd.Timestamp:
         if not validate_date or not periods:
             return tdate
-        if tdate < pd.to_datetime("1994-01-06"):
+        if tdate < pd.to_datetime("1997-02-01"):
             return tdate
 
         while tdate <= periods[-1]:
@@ -187,7 +187,6 @@ def get_trading_dates() -> List[pd.Timestamp]:
 
 
 @flow(
-    name="flow-institute_foreign-flow_institute_foreign_history",
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),
@@ -210,7 +209,6 @@ def flow_institute_foreign_history():
 
 
 @flow(
-    name="flow-institute_foreign-flow_institute_foreign",
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),

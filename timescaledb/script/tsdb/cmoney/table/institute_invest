@@ -79,4 +79,4 @@ comment
 
 -- select * from ft_get_table_description('institute_invest');
 
--- select (tdate) from cmoney.institute_invest;
+-- select * from cmoney.institute_invest order by tdate desc limit 10;

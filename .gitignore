@@ -3,6 +3,7 @@ XQ_output/*
 ~$*
 *_hist.xlsx
 *.xlsx
+jupyter
 
 
 .vscode

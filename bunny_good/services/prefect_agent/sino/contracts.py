@@ -46,7 +46,6 @@ def save2db(df: pd.DataFrame):
 
 
 @flow(
-    name="flow-contracts-flow_contracts",
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),

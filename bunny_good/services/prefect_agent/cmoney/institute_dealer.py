@@ -173,7 +173,6 @@ def get_trading_dates() -> List[pd.Timestamp]:
 
 
 @flow(
-    name="flow-institute_dealer-flow_institute_dealer_history",
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),
@@ -196,7 +195,6 @@ def flow_institute_dealer_history():
 
 
 @flow(
-    name="flow-institute_dealer-flow_institute_dealer",
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),
