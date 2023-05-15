@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS tsdb.sino.contracts;
-CREATE TABLE tsdb.sino.contracts(
+DROP TABLE IF EXISTS accountdb.public.contracts;
+CREATE TABLE accountdb.public.contracts(
     security_type name,
     exchange name,
     code name NOT NULL PRIMARY KEY,
@@ -25,4 +25,4 @@ CREATE TABLE tsdb.sino.contracts(
     target_code name
 );
 
--- select * from tsdb.sino.contracts limit 10;
+-- select * from accountdb.public.contracts limit 10;

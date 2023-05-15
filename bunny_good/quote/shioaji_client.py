@@ -3,7 +3,7 @@ import shioaji as sj
 import pandas as pd
 import time
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Dict
 from threading import Lock, Thread
 from loguru import logger
 from functools import wraps
@@ -17,6 +17,7 @@ def api_wrapper(retries: int = 1, retry_wait: int = 3):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
+                    exc = e
                     logger.error(f"func: {func.__name__} | failed | retry: {k}")
                     logger.exception(e)
                     time.sleep(retry_wait)
