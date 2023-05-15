@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS accountdb.dealer.status;
 CREATE TABLE accountdb.dealer.status(
+    id serial primary key,
     strategy INT,
     security_type char(1), -- S, F
     code varchar(10),
