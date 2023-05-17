@@ -4,13 +4,12 @@ XQ_output/*
 *_hist.xlsx
 *.xlsx
 jupyter
-
+test_fifo*
 
 .vscode
 .env
 doc
 *.log
-test_fifo
 
 # pipenv
 Pipfile
