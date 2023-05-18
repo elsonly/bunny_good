@@ -18,13 +18,13 @@ def get_workbook_path() -> Path:
             Path()
             .absolute()
             .joinpath(
-                "bunny_good/services/prefect_agent/cmoney/docs/institute_dealer.xlsm"
+                "bunny_good/services/prefect_agent/cmoney/docs/dividend_policy.xlsm"
             )
         )
     return wb_path
 
 
-@task(name="task-institute_dealer-update_workbook", retries=3, retry_delay_seconds=3)
+@task(name="task-dividend_policy-update_workbook", retries=3, retry_delay_seconds=3)
 def update_workbook(
     start_date: pd.Timestamp = None,
     end_date: pd.Timestamp = None,
@@ -45,24 +45,30 @@ def update_workbook(
 
     logger = get_run_logger()
     items = {
-        "自營商買張": "日自營商進出排行",
-        "自營商賣張": "日自營商進出排行",
-        "自營商買賣超": "日自營商進出排行",
-        "自營商買張(自行買賣)": "日自營商進出排行",
-        "自營商賣張(自行買賣)": "日自營商進出排行",
-        "自營商買賣超(自行買賣)": "日自營商進出排行",
-        "自營商買張(避險)": "日自營商進出排行",
-        "自營商賣張(避險)": "日自營商進出排行",
-        "自營商買賣超(避險)": "日自營商進出排行",
-        "自營商庫存": "日自營商進出排行",
-        "自營商買金額(千)": "日自營商進出排行",
-        "自營商賣金額(千)": "日自營商進出排行",
-        "自營商買賣超金額(千)": "日自營商進出排行",
-        "自營商買均價": "日自營商進出排行",
-        "自營商賣均價": "日自營商進出排行",
-        "自營商持股比率(%)": "日自營商進出排行",
-        "自營商持股市值(百萬)": "日自營商進出排行",
-        "自營商持股成本": "日自營商進出排行",
+        "外資買張": "日外資持股與排行",
+        "外資賣張": "日外資持股與排行",
+        "外資買賣超": "日外資持股與排行",
+        "外資持股異動": "日外資持股與排行",
+        "外資持股張數": "日外資持股與排行",
+        "外資及陸資(不含外資自營商)買張": "日外資持股與排行",
+        "外資及陸資(不含外資自營商)賣張": "日外資持股與排行",
+        "外資及陸資(不含外資自營商)買賣超": "日外資持股與排行",
+        "外資自營商買張": "日外資持股與排行",
+        "外資自營商賣張": "日外資持股與排行",
+        "外資自營商買賣超": "日外資持股與排行",
+        "外資買金額(千)": "日外資持股與排行",
+        "外資賣金額(千)": "日外資持股與排行",
+        "外資買賣超金額(千)": "日外資持股與排行",
+        "外資買均價": "日外資持股與排行",
+        "外資賣均價": "日外資持股與排行",
+        "外資持股比率(%)": "日外資持股與排行",
+        "外資持股市值(百萬)": "日外資持股與排行",
+        "外資持股成本": "日外資持股與排行",
+        "外資尚可投資張數": "日外資持股與排行",
+        "外資尚可投資比率(%)": "日外資持股與排行",
+        "外資投資上限比率(%)": "日外資持股與排行",
+        "陸資投資上限比率(%)": "日外資持股與排行",
+        "與前日異動原因": "日外資持股與排行",
     }
     wb_path = get_workbook_path()
     logger.info(wb_path)
@@ -93,7 +99,7 @@ def update_workbook(
         wb.close()
 
 
-@task(name="task-institute_dealer-process_data")
+@task(name="task-dividend_policy-process_data")
 def process_data() -> Dict[str, pd.DataFrame]:
     collection = {}
     wb_path = get_workbook_path()
@@ -104,24 +110,30 @@ def process_data() -> Dict[str, pd.DataFrame]:
 
     columns = df.iloc[1:, 3].str[8:].unique()
     col_map = {
-        "自營商買張": "buy",
-        "自營商賣張": "sell",
-        "自營商買賣超": "net",
-        "自營商買張(自行買賣)": "buy_self",
-        "自營商賣張(自行買賣)": "sell_self",
-        "自營商買賣超(自行買賣)": "net_self",
-        "自營商買張(避險)": "buy_hedge",
-        "自營商賣張(避險)": "sell_hedge",
-        "自營商買賣超(避險)": "net_hedge",
-        "自營商庫存": "position",
-        "自營商買金額(千)": "buy_amt",
-        "自營商賣金額(千)": "sell_amt",
-        "自營商買賣超金額(千)": "net_amt",
-        "自營商買均價": "buy_avg_prc",
-        "自營商賣均價": "sell_avg_prc",
-        "自營商持股比率(%)": "holding_ratio",
-        "自營商持股市值(百萬)": "holding_mkt_value",
-        "自營商持股成本": "holding_avg_prc",
+        "外資買張": "buy",
+        "外資賣張": "sell",
+        "外資買賣超": "net",
+        "外資持股異動": "holding_chg",
+        "外資持股張數": "holding_chg_shares",
+        "外資及陸資(不含外資自營商)買張": "buy_ex_dealer",
+        "外資及陸資(不含外資自營商)賣張": "sell_ex_dealer",
+        "外資及陸資(不含外資自營商)買賣超": "net_ex_dealer",
+        "外資自營商買張": "buy_dealer",
+        "外資自營商賣張": "sell_dealer",
+        "外資自營商買賣超": "net_dealer",
+        "外資買金額(千)": "buy_amt",
+        "外資賣金額(千)": "sell_amt",
+        "外資買賣超金額(千)": "net_amt",
+        "外資買均價": "buy_avg_prc",
+        "外資賣均價": "sell_avg_prc",
+        "外資持股比率(%)": "holding_ratio",
+        "外資持股市值(百萬)": "holding_mkt_value",
+        "外資持股成本": "holding_avg_prc",
+        "外資尚可投資張數": "avalible_shares",
+        "外資尚可投資比率(%)": "avalible_ratio",
+        "外資投資上限比率(%)": "avalible_limit",
+        "陸資投資上限比率(%)": "avalible_limit_cn",
+        "與前日異動原因": "reason_for_chg",
     }
 
     for code in df.columns[4:]:
@@ -136,18 +148,20 @@ def process_data() -> Dict[str, pd.DataFrame]:
             continue
         tmp["tdate"] = pd.to_datetime(tmp.index)
         tmp["code"] = code
+        tmp["reason_for_chg"] = tmp["reason_for_chg"].astype(str)
+        tmp.loc[tmp["reason_for_chg"] == "nan", "reason_for_chg"] = None
 
         collection[code] = tmp
 
     return collection
 
 
-@task(name="task-institute_dealer-save2db")
+@task(name="task-dividend_policy-save2db")
 def save2db(collection: Dict[str, pd.DataFrame]):
     dm = DataManager(verbose=False)
     for code, df in collection.items():
         dm.save(
-            "cmoney.institute_dealer",
+            "cmoney.dividend_policy",
             df,
             method="timeseries",
             time_col="tdate",
@@ -155,17 +169,17 @@ def save2db(collection: Dict[str, pd.DataFrame]):
         )
 
 
-@task(name="task-institute_dealer-get_last_date")
+@task(name="task-dividend_policy-get_last_date")
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
-    last_date = dm.get_max_datetime("cmoney.institute_dealer", {}, "tdate")
+    last_date = dm.get_max_datetime("cmoney.dividend_policy", {}, "tdate")
     if last_date is None:
-        return pd.to_datetime("2001-01-02")
+        return pd.to_datetime("1994-01-06")
     else:
         return pd.to_datetime(last_date)
 
 
-@task(name="task-institute_dealer-get_trading_dates")
+@task(name="task-dividend_policy-get_trading_dates")
 def get_trading_dates() -> List[pd.Timestamp]:
     dm = DataManager(verbose=False)
     tdates = [pd.to_datetime(x) for x in dm.get_twse_trading_dates()]
@@ -178,7 +192,7 @@ def get_trading_dates() -> List[pd.Timestamp]:
     task_runner=SequentialTaskRunner(),
     on_failure=flow_error_handle,
 )
-def flow_institute_dealer_history():
+def flow_dividend_policy_history():
     logger = get_run_logger()
     today = pd.Timestamp.today()
     start_date = get_last_date() + pd.offsets.Day()
@@ -200,11 +214,11 @@ def flow_institute_dealer_history():
     task_runner=SequentialTaskRunner(),
     on_failure=flow_error_handle,
 )
-def flow_institute_dealer():
+def flow_dividend_policy():
     logger = get_run_logger()
     end_date = pd.Timestamp.today()
     start_date = end_date - 5 * pd.offsets.BDay()
     logger.info(f"{start_date} ~ {end_date}")
-    update_workbook(start_date, end_date)
+    update_workbook(start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
     collections = process_data()
     save2db(collections)
