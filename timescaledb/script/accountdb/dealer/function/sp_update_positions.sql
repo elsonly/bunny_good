@@ -20,7 +20,7 @@ BEGIN
 		insert into dealer.positions(
 			tdate, strategy, code, action, qty, cost_amt, avg_prc, close, pnl
 		)
-			select * from dealer.ft_get_positions_open_pnl_fifo(t_row.tdate, false);
+			select * from dealer.ft_get_position_open_pnl(t_row.tdate, false);
 
     END LOOP;
 END;

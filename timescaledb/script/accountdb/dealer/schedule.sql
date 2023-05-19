@@ -8,3 +8,4 @@ SELECT add_job(
 SELECT * FROM timescaledb_information.jobs;
 
 CALL run_job(1000);
+-- select * from dealer.positions where tdate = CURRENT_DATE;

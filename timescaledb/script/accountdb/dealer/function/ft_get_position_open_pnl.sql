@@ -1,7 +1,7 @@
 
-drop function if exists dealer.ft_get_positions_open_pnl_fifo;
+drop function if exists dealer.ft_get_position_open_pnl;
 
-CREATE or replace function dealer.ft_get_positions_open_pnl_fifo(
+CREATE or replace function dealer.ft_get_position_open_pnl(
 	in_date date,
     in_use_realtime boolean
 )
@@ -17,7 +17,7 @@ returns table(
     pnl double precision
 )
 /*
-	select * from dealer.ft_get_positions_open_pnl_fifo(CURRENT_DATE, true) order by code;
+	select * from dealer.ft_get_position_open_pnl(CURRENT_DATE, true) order by code;
 */
 
 AS $$
