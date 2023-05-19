@@ -219,6 +219,6 @@ def flow_institute_foreign():
     end_date = pd.Timestamp.today()
     start_date = end_date - 5 * pd.offsets.BDay()
     logger.info(f"{start_date} ~ {end_date}")
-    update_workbook(start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
+    update_workbook(start_date, end_date)
     collections = process_data()
     save2db(collections)

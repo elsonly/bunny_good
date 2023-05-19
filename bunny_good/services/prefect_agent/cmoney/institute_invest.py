@@ -59,7 +59,7 @@ def get_workbook_path() -> Path:
 
 
 @task(name="task-institute_invest-update_workbook", retries=3, retry_delay_seconds=3)
-def update_workbook(start_date: str, end_date: str):
+def update_workbook(start_date: pd.Timestamp, end_date: pd.Timestamp):
     logger = get_run_logger()
     items = {
         "上市買進金額(百萬)": "三大法人買賣超",
@@ -94,10 +94,10 @@ def update_workbook(start_date: str, end_date: str):
             req_date = start_date
             while req_date <= end_date:
                 sh.range(f"A{idx}").value = f"{table}.{item}"
-                sh.range(f"B{idx}").value = req_date
-                req_date = (pd.to_datetime(req_date) + pd.offsets.BDay()).strftime(
+                sh.range(f"B{idx}").value = req_date.strftime(
                     "%Y%m%d"
                 )
+                req_date = pd.to_datetime(req_date) + pd.offsets.BDay()
                 idx += 1
 
         logger.info("update data...")
@@ -180,6 +180,6 @@ def flow_institute_invest():
     end_date = pd.Timestamp.today()
     start_date = end_date - 5 * pd.offsets.BDay()
     logger.info(f"{start_date} ~ {end_date}")
-    update_workbook(start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
+    update_workbook(start_date, end_date)
     collections = process_data()
     save2db(collections)
