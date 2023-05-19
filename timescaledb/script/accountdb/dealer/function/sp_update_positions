@@ -8,9 +8,9 @@ DECLARE
 	
 BEGIN
 	RAISE NOTICE 'Executing job % with config %', job_id, config;
-
     for t_row in (
         select distinct tdate 
+		-- TODO: change source table for trading dates
         from cmoney.institute_invest 
         where tdate > CURRENT_DATE-20
             and tdate not in (select distinct tdate from dealer.positions)
@@ -20,27 +20,7 @@ BEGIN
 		insert into dealer.positions(
 			tdate, strategy, code, action, qty, cost_amt, avg_prc, close, pnl
 		)
-			select 
-				t_pos.tdate,
-				t_pos.strategy,
-				t_pos.code,
-				t_pos.action,
-				t_pos.qty,
-				t_pos.cost_amt,
-				t_pos.avg_prc,
-				t_prc.close,
-				(case t_pos.action when 'B' then 1 else -1 end)* (t_prc.close - t_pos.avg_prc) * t_pos.qty * 1000 as pnl
-			from (
-				select * from dealer.ft_get_positions_fifo(t_row.tdate, 'B')
-				union all
-				select * from dealer.ft_get_positions_fifo(t_row.tdate, 'S')
-			)t_pos
-			left join(
-				select tt0.tdate, tt0.code, tt0.close
-				from cmoney.daily_price tt0
-				where tt0.code in (select distinct code from dealer.trades)
-					and tt0.tdate=t_row.tdate
-			)t_prc on t_prc.code=t_pos.code;
+			select * from dealer.ft_get_positions_open_pnl_fifo(t_row.tdate, false);
 
     END LOOP;
 END;

@@ -27,12 +27,11 @@ BEGIN
 		select t0.id, t0.strategy, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time
 		from dealer.trades t0
 		where t0.trade_date <= in_date
-			and t0.status = 'Filled'
 
 	), cteStockSum as(
 		select 
 			t0.strategy, t0.code,
-			case when sum(case t0.action when 'B' then 1 else -1 end * t0.qty ) > 0 
+			case when sum(case t0.action when 'B' then 1 else -1 end * t0.qty ) >= 0 
 				then 'B' else 'S' end as action,
 			abs(sum(case t0.action when 'B' then 1 else -1 end * t0.qty )) as tot_qty
 		from cteTrades t0
@@ -99,6 +98,7 @@ BEGIN
 		sum(t0.price * t0.qty) * 1000 as cost_amt,
 		sum(t0.price * t0.qty) / sum(t0.qty) as avg_prc
 	from ctePrice t0
+	where t0.qty > 0
 	group by t0.strategy, t0.code;
 
 END;
