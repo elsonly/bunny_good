@@ -70,6 +70,6 @@ comment on column cmoney.institute_foreign.avalible_limit_cn is '陸資投資上
 comment on column cmoney.institute_foreign.reason_for_chg is '與前日異動原因';
 
 
--- select * from tsdb.cmoney.institute_foreign where code = '1102' order by tdate desc;
+-- select * from cmoney.institute_foreign where code = '1102' order by tdate desc;
 -- select * from ft_get_table_description('institute_foreign');
 

@@ -34,7 +34,7 @@ def update_workbook(
     def get_validate_date(tdate: pd.Timestamp) -> pd.Timestamp:
         if not validate_date or not periods:
             return tdate
-        if tdate < pd.to_datetime("1994-01-06"):
+        if tdate < pd.to_datetime("1997-02-01"):
             return tdate
 
         while tdate <= periods[-1]:
@@ -160,7 +160,7 @@ def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
     last_date = dm.get_max_datetime("cmoney.institute_dealer", {}, "tdate")
     if last_date is None:
-        return pd.to_datetime("1994-01-06")
+        return pd.to_datetime("2001-01-02")
     else:
         return pd.to_datetime(last_date)
 
@@ -173,7 +173,6 @@ def get_trading_dates() -> List[pd.Timestamp]:
 
 
 @flow(
-    name="flow-institute_dealer-flow_institute_dealer_history",
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),
@@ -196,7 +195,6 @@ def flow_institute_dealer_history():
 
 
 @flow(
-    name="flow-institute_dealer-flow_institute_dealer",
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),
@@ -207,6 +205,6 @@ def flow_institute_dealer():
     end_date = pd.Timestamp.today()
     start_date = end_date - 5 * pd.offsets.BDay()
     logger.info(f"{start_date} ~ {end_date}")
-    update_workbook(start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
+    update_workbook(start_date, end_date)
     collections = process_data()
     save2db(collections)

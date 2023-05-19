@@ -18,13 +18,13 @@ def get_workbook_path() -> Path:
             Path()
             .absolute()
             .joinpath(
-                "bunny_good/services/prefect_agent/cmoney/docs/institute_foreign.xlsm"
+                "bunny_good/services/prefect_agent/cmoney/docs/dividend_policy.xlsm"
             )
         )
     return wb_path
 
 
-@task(name="task-institute_foreign-update_workbook", retries=3, retry_delay_seconds=3)
+@task(name="task-dividend_policy-update_workbook", retries=3, retry_delay_seconds=3)
 def update_workbook(
     start_date: pd.Timestamp = None,
     end_date: pd.Timestamp = None,
@@ -99,7 +99,7 @@ def update_workbook(
         wb.close()
 
 
-@task(name="task-institute_foreign-process_data")
+@task(name="task-dividend_policy-process_data")
 def process_data() -> Dict[str, pd.DataFrame]:
     collection = {}
     wb_path = get_workbook_path()
@@ -156,12 +156,12 @@ def process_data() -> Dict[str, pd.DataFrame]:
     return collection
 
 
-@task(name="task-institute_foreign-save2db")
+@task(name="task-dividend_policy-save2db")
 def save2db(collection: Dict[str, pd.DataFrame]):
     dm = DataManager(verbose=False)
     for code, df in collection.items():
         dm.save(
-            "cmoney.institute_foreign",
+            "cmoney.dividend_policy",
             df,
             method="timeseries",
             time_col="tdate",
@@ -169,17 +169,17 @@ def save2db(collection: Dict[str, pd.DataFrame]):
         )
 
 
-@task(name="task-institute_foreign-get_last_date")
+@task(name="task-dividend_policy-get_last_date")
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
-    last_date = dm.get_max_datetime("cmoney.institute_foreign", {}, "tdate")
+    last_date = dm.get_max_datetime("cmoney.dividend_policy", {}, "tdate")
     if last_date is None:
         return pd.to_datetime("1994-01-06")
     else:
         return pd.to_datetime(last_date)
 
 
-@task(name="task-institute_foreign-get_trading_dates")
+@task(name="task-dividend_policy-get_trading_dates")
 def get_trading_dates() -> List[pd.Timestamp]:
     dm = DataManager(verbose=False)
     tdates = [pd.to_datetime(x) for x in dm.get_twse_trading_dates()]
@@ -192,7 +192,7 @@ def get_trading_dates() -> List[pd.Timestamp]:
     task_runner=SequentialTaskRunner(),
     on_failure=flow_error_handle,
 )
-def flow_institute_foreign_history():
+def flow_dividend_policy_history():
     logger = get_run_logger()
     today = pd.Timestamp.today()
     start_date = get_last_date() + pd.offsets.Day()
@@ -214,7 +214,7 @@ def flow_institute_foreign_history():
     task_runner=SequentialTaskRunner(),
     on_failure=flow_error_handle,
 )
-def flow_institute_foreign():
+def flow_dividend_policy():
     logger = get_run_logger()
     end_date = pd.Timestamp.today()
     start_date = end_date - 5 * pd.offsets.BDay()
