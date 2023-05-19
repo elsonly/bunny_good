@@ -15,7 +15,6 @@ CREATE TABLE accountdb.dealer.trades(
     action char(1), -- B, S
     price double precision,
     qty int,
-    status varchar(10),
     CONSTRAINT fk_strategy FOREIGN KEY(strategy) REFERENCES dealer.strategy(id)
 );
 CREATE INDEX idx_trades_date ON accountdb.dealer.trades(trade_date);
