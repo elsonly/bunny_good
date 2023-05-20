@@ -91,6 +91,25 @@ deployments[51] = Deployment.build_from_flow(
     infra_overrides={"env": {}},
     work_pool_name="local-work",
 )
+deployments[52] = Deployment.build_from_flow(
+    flow=cmoney.flow_dividend_policy_quarterly,
+    name="cmoney",
+    version=1,
+    schedule=(CronSchedule(cron="2 0 * * *", timezone="Asia/Taipei")),
+    is_schedule_active=True,
+    tags=["twse", "cmoney"],
+    infra_overrides={"env": {}},
+    work_pool_name="local-work",
+)
+deployments[53] = Deployment.build_from_flow(
+    flow=cmoney.flow_dividend_policy_quarterly_history,
+    name="cmoney",
+    version=1,
+    is_schedule_active=False,
+    tags=["twse", "cmoney"],
+    infra_overrides={"env": {}},
+    work_pool_name="local-work",
+)
 # sino
 deployments[100] = Deployment.build_from_flow(
     flow=sino.flow_contracts,
