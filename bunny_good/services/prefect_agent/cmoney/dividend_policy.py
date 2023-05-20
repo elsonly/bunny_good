@@ -31,44 +31,61 @@ def update_workbook(
     periods: List[pd.Timestamp] = [],
     validate_date: bool = False,
 ):
-    def get_validate_date(tdate: pd.Timestamp) -> pd.Timestamp:
-        if not validate_date or not periods:
-            return tdate
-        if tdate < pd.to_datetime("1997-02-01"):
-            return tdate
-
-        while tdate <= periods[-1]:
-            if tdate in periods:
-                return tdate
-            tdate += pd.offsets.Day()
-        return None
-
     logger = get_run_logger()
     items = {
-        "外資買張": "日外資持股與排行",
-        "外資賣張": "日外資持股與排行",
-        "外資買賣超": "日外資持股與排行",
-        "外資持股異動": "日外資持股與排行",
-        "外資持股張數": "日外資持股與排行",
-        "外資及陸資(不含外資自營商)買張": "日外資持股與排行",
-        "外資及陸資(不含外資自營商)賣張": "日外資持股與排行",
-        "外資及陸資(不含外資自營商)買賣超": "日外資持股與排行",
-        "外資自營商買張": "日外資持股與排行",
-        "外資自營商賣張": "日外資持股與排行",
-        "外資自營商買賣超": "日外資持股與排行",
-        "外資買金額(千)": "日外資持股與排行",
-        "外資賣金額(千)": "日外資持股與排行",
-        "外資買賣超金額(千)": "日外資持股與排行",
-        "外資買均價": "日外資持股與排行",
-        "外資賣均價": "日外資持股與排行",
-        "外資持股比率(%)": "日外資持股與排行",
-        "外資持股市值(百萬)": "日外資持股與排行",
-        "外資持股成本": "日外資持股與排行",
-        "外資尚可投資張數": "日外資持股與排行",
-        "外資尚可投資比率(%)": "日外資持股與排行",
-        "外資投資上限比率(%)": "日外資持股與排行",
-        "陸資投資上限比率(%)": "日外資持股與排行",
-        "與前日異動原因": "日外資持股與排行",
+        "年度": "股利政策表",
+        "配發次數": "股利政策表",
+        "除權日": "股利政策表",
+        "除權最後回補日": "股利政策表",
+        "除息日": "股利政策表",
+        "除息最後回補日": "股利政策表",
+        "除權分派基準日": "股利政策表",
+        "除息分派基準日": "股利政策表",
+        "領股日期": "股利政策表",
+        "領息日期": "股利政策表",
+        "盈餘配股(元)": "股利政策表",
+        "公積配股(元)": "股利政策表",
+        "股票股利合計(元)": "股利政策表",
+        "盈餘配息(元)": "股利政策表",
+        "公積配息(元)": "股利政策表",
+        "現金股利合計(元)": "股利政策表",
+        "股利合計(元)": "股利政策表",
+        "股票股利發放率(%)": "股利政策表",
+        "現金股利發放率(%)": "股利政策表",
+        "股利發放率(%)": "股利政策表",
+        "除權開盤競價基準": "股利政策表",
+        "除息開盤競價基準": "股利政策表",
+        "除權參考價": "股利政策表",
+        "除息參考價": "股利政策表",
+        "除權前股價": "股利政策表",
+        "除息前股價": "股利政策表",
+        "除權前股本(百萬)": "股利政策表",
+        "除權後股本(百萬)": "股利政策表",
+        "除權前市值比重(%)": "股利政策表",
+        "除息前市值比重(%)": "股利政策表",
+        "現金股利殖利率(%)": "股利政策表",
+        "股東股票股利總配股數(張)": "股利政策表",
+        "股東現金紅利總金額(千)": "股利政策表",
+        "員工酬勞配股(張)": "股利政策表",
+        "員工配股金額(千)": "股利政策表",
+        "員工紅利配股佔盈餘配股比例(%)": "股利政策表",
+        "員工酬勞現金(千)": "股利政策表",
+        "董監酬勞(千)": "股利政策表",
+        "酬勞差異數(千)": "股利政策表",
+        "扣除紅利及董監酬勞後之EPS": "股利政策表",
+        "董事會備註": "股利政策表",
+        "股東會備註": "股利政策表",
+        "董事會決議通過股利分派日": "股利政策表",
+        "股東會日期": "股利政策表",
+        "公告日期": "股利政策表",
+        "除權公告日期": "股利政策表",
+        "除息公告日期": "股利政策表",
+        "現增除權日": "股利政策表",
+        "現增類別": "股利政策表",
+        "現增認購價": "股利政策表",
+        "現增配股(股)": "股利政策表",
+        "現增總額(百萬)": "股利政策表",
+        "董監改選年度": "股利政策表",
     }
     wb_path = get_workbook_path()
     logger.info(wb_path)
@@ -78,16 +95,17 @@ def update_workbook(
         sh = wb.sheets("工作表1")
 
         logger.info("clear contents...")
-        sh.range("A3:CNZ1000").clear_contents()
+        rng = sh.range("A3:CNZ10000")
+        rng.delete()
 
         logger.info("update request items...")
         idx = 3
         for item, table in items.items():
-            req_date = get_validate_date(start_date)
+            req_date = start_date
             while req_date and req_date <= end_date:
                 sh.range(f"A{idx}").value = f"{table}.{item}"
-                sh.range(f"B{idx}").value = req_date.strftime("%Y%m%d")
-                req_date = get_validate_date(req_date + pd.offsets.Day())
+                sh.range(f"B{idx}").value = req_date.strftime("%Y")
+                req_date = req_date + pd.offsets.YearBegin()
 
                 idx += 1
 
@@ -108,48 +126,112 @@ def process_data() -> Dict[str, pd.DataFrame]:
     indexes.sort()
     df.set_index("基準日:最近一日", inplace=True)
 
-    columns = df.iloc[1:, 3].str[8:].unique()
+    items = df.iloc[1:, 3].str[4:].unique()
     col_map = {
-        "外資買張": "buy",
-        "外資賣張": "sell",
-        "外資買賣超": "net",
-        "外資持股異動": "holding_chg",
-        "外資持股張數": "holding_chg_shares",
-        "外資及陸資(不含外資自營商)買張": "buy_ex_dealer",
-        "外資及陸資(不含外資自營商)賣張": "sell_ex_dealer",
-        "外資及陸資(不含外資自營商)買賣超": "net_ex_dealer",
-        "外資自營商買張": "buy_dealer",
-        "外資自營商賣張": "sell_dealer",
-        "外資自營商買賣超": "net_dealer",
-        "外資買金額(千)": "buy_amt",
-        "外資賣金額(千)": "sell_amt",
-        "外資買賣超金額(千)": "net_amt",
-        "外資買均價": "buy_avg_prc",
-        "外資賣均價": "sell_avg_prc",
-        "外資持股比率(%)": "holding_ratio",
-        "外資持股市值(百萬)": "holding_mkt_value",
-        "外資持股成本": "holding_avg_prc",
-        "外資尚可投資張數": "avalible_shares",
-        "外資尚可投資比率(%)": "avalible_ratio",
-        "外資投資上限比率(%)": "avalible_limit",
-        "陸資投資上限比率(%)": "avalible_limit_cn",
-        "與前日異動原因": "reason_for_chg",
+        "年度": "year",
+        "配發次數": "distribution_frequency",
+        "除權日": "ex_rights_date",
+        "除權最後回補日": "ex_rights_last_compensation_date",
+        "除息日": "ex_dividend_date",
+        "除息最後回補日": "ex_dividend_last_compensation_date",
+        "除權分派基準日": "ex_rights_allotment_reference_date",
+        "除息分派基準日": "ex_dividend_allotment_reference_date",
+        "領股日期": "share_receipt_date",
+        "領息日期": "dividend_receipt_date",
+        "盈餘配股(元)": "earnings_stock_dividend",
+        "公積配股(元)": "surplus_stock_dividend",
+        "股票股利合計(元)": "total_stock_dividend",
+        "盈餘配息(元)": "earnings_cash_dividend",
+        "公積配息(元)": "surplus_cash_dividend",
+        "現金股利合計(元)": "total_cash_dividend",
+        "股利合計(元)": "total_dividend",
+        "股票股利發放率(%)": "stock_dividend_payout_ratio",
+        "現金股利發放率(%)": "cash_dividend_payout_ratio",
+        "股利發放率(%)": "dividend_payout_ratio",
+        "除權開盤競價基準": "ex_rights_opening_reference_price",
+        "除息開盤競價基準": "ex_dividend_opening_reference_price",
+        "除權參考價": "ex_rights_reference_price",
+        "除息參考價": "ex_dividend_reference_price",
+        "除權前股價": "pre_ex_rights_stock_price",
+        "除息前股價": "pre_ex_dividend_stock_price",
+        "除權前股本(百萬)": "pre_ex_rights_share_capital",
+        "除權後股本(百萬)": "post_ex_rights_share_capital",
+        "除權前市值比重(%)": "pre_ex_rights_market_value_ratio",
+        "除息前市值比重(%)": "pre_ex_dividend_market_value_ratio",
+        "現金股利殖利率(%)": "cash_dividend_yield",
+        "股東股票股利總配股數(張)": "total_shareholders_stock_dividend_allotment_shares",
+        "股東現金紅利總金額(千)": "total_shareholders_cash_dividend_amount",
+        "員工酬勞配股(張)": "employee_compensation_stock_allotment_shares",
+        "員工配股金額(千)": "employee_stock_allotment_amount",
+        "員工紅利配股佔盈餘配股比例(%)": "employee_bonus_stock_allotment_ratio_to_earnings_stock_dividend",
+        "員工酬勞現金(千)": "employee_cash_compensation",
+        "董監酬勞(千)": "directors_and_supervisors_compensation",
+        "酬勞差異數(千)": "compensation_difference",
+        "扣除紅利及董監酬勞後之EPS": "eps_after_deducting_dividends_and_directors_compensation",
+        "董事會備註": "board_remarks",
+        "股東會備註": "shareholders_meeting_remarks",
+        "董事會決議通過股利分派日": "dividend_distribution_date_approved_by_the_board_of_directors",
+        "股東會日期": "shareholders_meeting_date",
+        "公告日期": "announcement_date",
+        "除權公告日期": "ex_rights_announcement_date",
+        "除息公告日期": "ex_dividend_announcement_date",
+        "現增除權日": "rights_offering_date_for_capital_increase",
+        "現增類別": "type_of_capital_increase",
+        "現增認購價": "subscription_price_for_capital_increase",
+        "現增配股(股)": "stock_allotment_for_capital_increase_shares",
+        "現增總額(百萬)": "total_amount_for_capital_increase",
+        "董監改選年度": "year_of_directors_and_supervisors_resignation_and_election",
     }
 
+    tmp_rows = {}
+    for item in items:
+        tmp_rows[item] = df.loc[df.iloc[:, 3].str[4:] == item]
+
     for code in df.columns[4:]:
-        tmp = pd.DataFrame(index=indexes)
-        for col in columns:
-            cond_row = df.iloc[:, 3].str.endswith(col)
-            tmp[col] = df.loc[cond_row, code]
+        tmp = pd.DataFrame(index=indexes, columns=items)
+        for item in items:
+            tmp_row = tmp_rows[item] 
+            tmp.loc[:, item] = tmp_row[code]
 
         tmp.dropna(how="all", axis=0, inplace=True)
         tmp.rename(columns=col_map, inplace=True)
+        for col in tmp.columns:
+            if col in [
+                "ex_rights_date",
+                "ex_rights_last_compensation_date",
+                "ex_dividend_date",
+                "ex_dividend_last_compensation_date",
+                "ex_rights_allotment_reference_date",
+                "ex_dividend_allotment_reference_date",
+                "share_receipt_date",
+                "dividend_receipt_date",
+                "dividend_distribution_date_approved_by_the_board_of_directors",
+                "shareholders_meeting_date",
+                "announcement_date",
+                "ex_rights_announcement_date",
+                "ex_dividend_announcement_date",
+                "rights_offering_date_for_capital_increase"
+            ]:
+                tmp.loc[pd.isnull(tmp[col]), col] = None
+        
+        for col in [
+            "distribution_frequency", 
+            "total_shareholders_stock_dividend_allotment_shares",
+            "total_shareholders_cash_dividend_amount",
+            "employee_compensation_stock_allotment_shares",
+            "employee_stock_allotment_amount",
+            "employee_bonus_stock_allotment_ratio_to_earnings_stock_dividend",
+            "employee_cash_compensation",
+            "directors_and_supervisors_compensation",
+            "compensation_difference",
+            "total_amount_for_capital_increase",
+            "year_of_directors_and_supervisors_resignation_and_election"
+        ]:
+            tmp.loc[pd.isnull(tmp[col]), col] = None
+
         if tmp.empty:
             continue
-        tmp["tdate"] = pd.to_datetime(tmp.index)
         tmp["code"] = code
-        tmp["reason_for_chg"] = tmp["reason_for_chg"].astype(str)
-        tmp.loc[tmp["reason_for_chg"] == "nan", "reason_for_chg"] = None
 
         collection[code] = tmp
 
@@ -163,28 +245,20 @@ def save2db(collection: Dict[str, pd.DataFrame]):
         dm.save(
             "cmoney.dividend_policy",
             df,
-            method="timeseries",
-            time_col="tdate",
-            conditions={"code": code},
+            method="upsert",
+            conflict_cols=["year", "code"]
         )
 
 
 @task(name="task-dividend_policy-get_last_date")
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
-    last_date = dm.get_max_datetime("cmoney.dividend_policy", {}, "tdate")
+    last_date = dm.get_max_datetime("cmoney.dividend_policy", {}, "announcement_date")
     if last_date is None:
-        return pd.to_datetime("1994-01-06")
+        return pd.to_datetime("1990-01-01")
     else:
         return pd.to_datetime(last_date)
-
-
-@task(name="task-dividend_policy-get_trading_dates")
-def get_trading_dates() -> List[pd.Timestamp]:
-    dm = DataManager(verbose=False)
-    tdates = [pd.to_datetime(x) for x in dm.get_twse_trading_dates()]
-    return tdates
-
+    
 
 @flow(
     retries=2,
@@ -195,17 +269,16 @@ def get_trading_dates() -> List[pd.Timestamp]:
 def flow_dividend_policy_history():
     logger = get_run_logger()
     today = pd.Timestamp.today()
-    start_date = get_last_date() + pd.offsets.Day()
-    trading_dates = get_trading_dates()
+    start_date = get_last_date()
     while start_date <= today:
-        end_date = start_date + pd.offsets.MonthEnd()
+        end_date = start_date + 5*pd.offsets.YearEnd()
         if end_date >= today:
             end_date = today
         logger.info(f"{start_date} ~ {end_date}")
-        update_workbook(start_date, end_date, periods=trading_dates, validate_date=True)
+        update_workbook(start_date, end_date)
         collections = process_data()
         save2db(collections)
-        start_date += pd.offsets.MonthBegin()
+        start_date = end_date + pd.offsets.YearBegin()
 
 
 @flow(
@@ -217,7 +290,7 @@ def flow_dividend_policy_history():
 def flow_dividend_policy():
     logger = get_run_logger()
     end_date = pd.Timestamp.today()
-    start_date = end_date - 5 * pd.offsets.BDay()
+    start_date = end_date - pd.offsets.YearEnd()
     logger.info(f"{start_date} ~ {end_date}")
     update_workbook(start_date, end_date)
     collections = process_data()

@@ -72,7 +72,8 @@ def update_workbook(
         sh = wb.sheets("工作表1")
 
         logger.info("clear contents...")
-        sh.range("A3:CNZ1000").clear_contents()
+        rng = sh.range("A3:CNZ10000")
+        rng.delete()
 
         logger.info("update request items...")
         idx = 3

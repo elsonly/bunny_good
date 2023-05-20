@@ -86,7 +86,8 @@ def update_workbook(start_date: pd.Timestamp, end_date: pd.Timestamp):
         sh = wb.sheets("工作表1")
 
         logger.info("clear contents...")
-        sh.range("A3:Y1000").clear_contents()
+        rng = sh.range("A3:CNZ10000")
+        rng.delete()
 
         logger.info("update request items...")
         idx = 3
