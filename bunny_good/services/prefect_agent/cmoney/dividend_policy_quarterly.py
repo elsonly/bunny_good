@@ -22,8 +22,8 @@ def get_workbook_path() -> Path:
             )
         )
     return wb_path
-
-
+start_date = pd.Timestamp.now() - 2*pd.offsets.YearBegin()
+end_date = pd.Timestamp.now()
 @task(
     name="task-dividend_policy_quarterly-update_workbook",
     retries=3,
@@ -101,13 +101,15 @@ def update_workbook(
 
         logger.info("update request items...")
         idx = 3
+        quarters = [
+            f"{y}Q{q}"
+            for q in range(1, 5)
+            for y in range(start_date.year, end_date.year+1)
+        ]
         for item, table in items.items():
-            req_date = start_date
-            while req_date and req_date <= end_date:
+            for q in quarters:
                 sh.range(f"A{idx}").value = f"{table}.{item}"
-                sh.range(f"B{idx}").value = req_date.strftime("%Y")
-                req_date = req_date + pd.offsets.YearBegin()
-
+                sh.range(f"B{idx}").value = q
                 idx += 1
 
         logger.info("update data...")
@@ -270,7 +272,7 @@ def flow_dividend_policy_quarterly_history():
     today = pd.Timestamp.today()
     start_date = get_last_date()
     while start_date <= today:
-        end_date = start_date + 5 * pd.offsets.YearEnd()
+        end_date = start_date + 2 * pd.offsets.YearEnd()
         if end_date >= today:
             end_date = today
         logger.info(f"{start_date} ~ {end_date}")

@@ -27,7 +27,7 @@ deployments[2] = Deployment.build_from_flow(
     flow=cmoney.flow_institute_invest,
     name="cmoney",
     version=1,
-    schedule=(CronSchedule(cron="57 14 * * *", timezone="Asia/Taipei")),
+    schedule=(CronSchedule(cron="0 16 * * *", timezone="Asia/Taipei")),
     is_schedule_active=True,
     tags=["twse", "cmoney"],
     infra_overrides={"env": {}},
@@ -37,7 +37,7 @@ deployments[3] = Deployment.build_from_flow(
     flow=cmoney.flow_institute_foreign,
     name="cmoney",
     version=1,
-    schedule=(CronSchedule(cron="10 0 * * *", timezone="Asia/Taipei")),
+    schedule=(CronSchedule(cron="2 16 * * *", timezone="Asia/Taipei")),
     is_schedule_active=True,
     tags=["twse", "cmoney"],
     infra_overrides={"env": {}},
@@ -56,7 +56,7 @@ deployments[5] = Deployment.build_from_flow(
     flow=cmoney.flow_institute_dealer,
     name="cmoney",
     version=1,
-    schedule=(CronSchedule(cron="15 0 * * *", timezone="Asia/Taipei")),
+    schedule=(CronSchedule(cron="4 16 * * *", timezone="Asia/Taipei")),
     is_schedule_active=True,
     tags=["twse", "cmoney"],
     infra_overrides={"env": {}},
@@ -64,6 +64,25 @@ deployments[5] = Deployment.build_from_flow(
 )
 deployments[6] = Deployment.build_from_flow(
     flow=cmoney.flow_institute_dealer_history,
+    name="cmoney",
+    version=1,
+    is_schedule_active=False,
+    tags=["twse", "cmoney"],
+    infra_overrides={"env": {}},
+    work_pool_name="local-work",
+)
+deployments[7] = Deployment.build_from_flow(
+    flow=cmoney.flow_institute_fund,
+    name="cmoney",
+    version=1,
+    schedule=(CronSchedule(cron="6 16 * * *", timezone="Asia/Taipei")),
+    is_schedule_active=True,
+    tags=["twse", "cmoney"],
+    infra_overrides={"env": {}},
+    work_pool_name="local-work",
+)
+deployments[8] = Deployment.build_from_flow(
+    flow=cmoney.flow_institute_fund_history,
     name="cmoney",
     version=1,
     is_schedule_active=False,

@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS tsdb.cmoney.dividend_policy_quarterly;
 CREATE TABLE tsdb.cmoney.dividend_policy_quarterly(
     code VARCHAR(10) NOT NULL,
-    year INT NOT NULL,
+    year CHAR(6) NOT NULL,
     distribution_frequency smallint,
     ex_rights_date date,
     ex_rights_last_compensation_date date,
