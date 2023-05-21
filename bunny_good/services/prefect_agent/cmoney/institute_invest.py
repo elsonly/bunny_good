@@ -58,7 +58,11 @@ def get_workbook_path() -> Path:
     return wb_path
 
 
-@task(name="task-institute_invest-update_workbook", retries=3, retry_delay_seconds=3)
+@task(
+    name="task-institute_invest-update_workbook",
+    retries=3,
+    retry_delay_seconds=3,
+)
 def update_workbook(start_date: pd.Timestamp, end_date: pd.Timestamp):
     logger = get_run_logger()
     items = {
@@ -95,9 +99,7 @@ def update_workbook(start_date: pd.Timestamp, end_date: pd.Timestamp):
             req_date = start_date
             while req_date <= end_date:
                 sh.range(f"A{idx}").value = f"{table}.{item}"
-                sh.range(f"B{idx}").value = req_date.strftime(
-                    "%Y%m%d"
-                )
+                sh.range(f"B{idx}").value = req_date.strftime("%Y%m%d")
                 req_date = pd.to_datetime(req_date) + pd.offsets.BDay()
                 idx += 1
 
@@ -118,8 +120,6 @@ def process_data() -> Dict[str, pd.DataFrame]:
     indexes.sort()
     df.set_index("基準日:最近一日", inplace=True)
 
-    columns = df.iloc[1:, 3].str[8:].unique()
-    df
     col_map = {
         "日期": "tdate",
         "代號": "inst_id",
@@ -139,12 +139,16 @@ def process_data() -> Dict[str, pd.DataFrame]:
         "興櫃賣出金額(百萬)": "oes_sell",
         "興櫃買賣超金額(百萬)": "oes_net",
     }
+    item_start_idx = 8
+    items = df.iloc[1:, 3].str[item_start_idx:].unique()
+    tmp_rows = {}
+    for item in items:
+        tmp_rows[item] = df.loc[df.iloc[:, 3].str[item_start_idx:] == item]
 
     for _id in df.columns[4:]:
-        tmp = pd.DataFrame(index=indexes)
-        for col in columns:
-            cond_row = df.iloc[:, 3].str.endswith(col)
-            tmp[col] = df.loc[cond_row, _id]
+        tmp = pd.DataFrame(index=indexes, columns=items)
+        for item in items:
+            tmp.loc[:, item] = tmp_rows[item][_id]
 
         tmp.dropna(how="all", axis=0, inplace=True)
         tmp.rename(columns=col_map, inplace=True)
@@ -157,7 +161,7 @@ def process_data() -> Dict[str, pd.DataFrame]:
     return collection
 
 
-@task(name="task-institute_invest-save2db")
+@task(name="task-institute_invest-save2db", log_prints=True)
 def save2db(collection: Dict[str, pd.DataFrame]):
     dm = DataManager(verbose=False)
     for inst_id, df in collection.items():

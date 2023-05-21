@@ -22,8 +22,12 @@ def get_workbook_path() -> Path:
             )
         )
     return wb_path
-start_date = pd.Timestamp.now() - 2*pd.offsets.YearBegin()
+
+
+start_date = pd.Timestamp.now() - 2 * pd.offsets.YearBegin()
 end_date = pd.Timestamp.now()
+
+
 @task(
     name="task-dividend_policy_quarterly-update_workbook",
     retries=3,
@@ -104,7 +108,7 @@ def update_workbook(
         quarters = [
             f"{y}Q{q}"
             for q in range(1, 5)
-            for y in range(start_date.year, end_date.year+1)
+            for y in range(start_date.year, end_date.year + 1)
         ]
         for item, table in items.items():
             for q in quarters:
@@ -129,7 +133,6 @@ def process_data() -> Dict[str, pd.DataFrame]:
     indexes.sort()
     df.set_index("基準日:最近一日", inplace=True)
 
-    items = df.iloc[1:, 3].str[6:].unique()
     col_map = {
         "年度": "year",
         "盈餘分派頻率": "distribution_frequency",
@@ -182,16 +185,16 @@ def process_data() -> Dict[str, pd.DataFrame]:
         "現增配股(股)": "stock_allotment_for_capital_increase_shares",
         "現增總額(百萬)": "total_amount_for_capital_increase",
     }
-
+    item_start_idx = 6
+    items = df.iloc[1:, 3].str[item_start_idx:].unique()
     tmp_rows = {}
     for item in items:
-        tmp_rows[item] = df.loc[df.iloc[:, 3].str[6:] == item]
+        tmp_rows[item] = df.loc[df.iloc[:, 3].str[item_start_idx:] == item]
 
     for code in df.columns[4:]:
         tmp = pd.DataFrame(index=indexes, columns=items)
         for item in items:
-            tmp_row = tmp_rows[item]
-            tmp.loc[:, item] = tmp_row[code]
+            tmp.loc[:, item] = tmp_rows[item][code]
 
         tmp.dropna(how="all", axis=0, inplace=True)
         tmp.rename(columns=col_map, inplace=True)
@@ -237,7 +240,7 @@ def process_data() -> Dict[str, pd.DataFrame]:
     return collection
 
 
-@task(name="task-dividend_policy_quarterly-save2db")
+@task(name="task-dividend_policy_quarterly-save2db", log_prints=True)
 def save2db(collection: Dict[str, pd.DataFrame]):
     dm = DataManager(verbose=False)
     for code, df in collection.items():
@@ -249,7 +252,7 @@ def save2db(collection: Dict[str, pd.DataFrame]):
         )
 
 
-@task(name="task-dividend_policy_quarterly-get_last_date")
+@task(name="task-dividend_policy_quarterly-get_last_date", log_prints=True)
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
     last_date = dm.get_max_datetime(

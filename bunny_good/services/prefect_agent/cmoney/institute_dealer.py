@@ -103,7 +103,6 @@ def process_data() -> Dict[str, pd.DataFrame]:
     indexes.sort()
     df.set_index("基準日:最近一日", inplace=True)
 
-    columns = df.iloc[1:, 3].str[8:].unique()
     col_map = {
         "自營商買張": "buy",
         "自營商賣張": "sell",
@@ -124,12 +123,16 @@ def process_data() -> Dict[str, pd.DataFrame]:
         "自營商持股市值(百萬)": "holding_mkt_value",
         "自營商持股成本": "holding_avg_prc",
     }
+    item_start_idx = 8
+    items = df.iloc[1:, 3].str[item_start_idx:].unique()
+    tmp_rows = {}
+    for item in items:
+        tmp_rows[item] = df.loc[df.iloc[:, 3].str[item_start_idx:] == item]
 
     for code in df.columns[4:]:
-        tmp = pd.DataFrame(index=indexes)
-        for col in columns:
-            cond_row = df.iloc[:, 3].str.endswith(col)
-            tmp[col] = df.loc[cond_row, code]
+        tmp = pd.DataFrame(index=indexes, columns=items)
+        for item in items:
+            tmp.loc[:, item] = tmp_rows[item][code]
 
         tmp.dropna(how="all", axis=0, inplace=True)
         tmp.rename(columns=col_map, inplace=True)
@@ -143,7 +146,7 @@ def process_data() -> Dict[str, pd.DataFrame]:
     return collection
 
 
-@task(name="task-institute_dealer-save2db")
+@task(name="task-institute_dealer-save2db", log_prints=True)
 def save2db(collection: Dict[str, pd.DataFrame]):
     dm = DataManager(verbose=False)
     for code, df in collection.items():
@@ -156,7 +159,7 @@ def save2db(collection: Dict[str, pd.DataFrame]):
         )
 
 
-@task(name="task-institute_dealer-get_last_date")
+@task(name="task-institute_dealer-get_last_date", log_prints=True)
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
     last_date = dm.get_max_datetime("cmoney.institute_dealer", {}, "tdate")
@@ -166,7 +169,7 @@ def get_last_date() -> pd.Timestamp:
         return pd.to_datetime(last_date)
 
 
-@task(name="task-institute_dealer-get_trading_dates")
+@task(name="task-institute_dealer-get_trading_dates", log_prints=True)
 def get_trading_dates() -> List[pd.Timestamp]:
     dm = DataManager(verbose=False)
     tdates = [pd.to_datetime(x) for x in dm.get_twse_trading_dates()]

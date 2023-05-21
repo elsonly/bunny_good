@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS accountdb.dealer.xq_signals;
 CREATE TABLE accountdb.dealer.xq_signals(
-    id BIGSERIAL PRIMARY KEY,
+    signal_id char(3),
+    ts INT,
     signal_date date,
     signal_time time,
     strategy_id INT,

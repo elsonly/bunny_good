@@ -126,7 +126,6 @@ def process_data() -> Dict[str, pd.DataFrame]:
     indexes.sort()
     df.set_index("基準日:最近一日", inplace=True)
 
-    items = df.iloc[1:, 3].str[4:].unique()
     col_map = {
         "年度": "year",
         "配發次數": "distribution_frequency",
@@ -182,16 +181,16 @@ def process_data() -> Dict[str, pd.DataFrame]:
         "現增總額(百萬)": "total_amount_for_capital_increase",
         "董監改選年度": "year_of_directors_and_supervisors_resignation_and_election",
     }
-
+    item_start_idx = 4
+    items = df.iloc[1:, 3].str[item_start_idx:].unique()
     tmp_rows = {}
     for item in items:
-        tmp_rows[item] = df.loc[df.iloc[:, 3].str[4:] == item]
+        tmp_rows[item] = df.loc[df.iloc[:, 3].str[item_start_idx:] == item]
 
     for code in df.columns[4:]:
         tmp = pd.DataFrame(index=indexes, columns=items)
         for item in items:
-            tmp_row = tmp_rows[item] 
-            tmp.loc[:, item] = tmp_row[code]
+            tmp.loc[:, item] = tmp_rows[item][code]
 
         tmp.dropna(how="all", axis=0, inplace=True)
         tmp.rename(columns=col_map, inplace=True)
@@ -210,12 +209,12 @@ def process_data() -> Dict[str, pd.DataFrame]:
                 "announcement_date",
                 "ex_rights_announcement_date",
                 "ex_dividend_announcement_date",
-                "rights_offering_date_for_capital_increase"
+                "rights_offering_date_for_capital_increase",
             ]:
                 tmp.loc[pd.isnull(tmp[col]), col] = None
-        
+
         for col in [
-            "distribution_frequency", 
+            "distribution_frequency",
             "total_shareholders_stock_dividend_allotment_shares",
             "total_shareholders_cash_dividend_amount",
             "employee_compensation_stock_allotment_shares",
@@ -225,7 +224,7 @@ def process_data() -> Dict[str, pd.DataFrame]:
             "directors_and_supervisors_compensation",
             "compensation_difference",
             "total_amount_for_capital_increase",
-            "year_of_directors_and_supervisors_resignation_and_election"
+            "year_of_directors_and_supervisors_resignation_and_election",
         ]:
             tmp.loc[pd.isnull(tmp[col]), col] = None
 
@@ -238,7 +237,7 @@ def process_data() -> Dict[str, pd.DataFrame]:
     return collection
 
 
-@task(name="task-dividend_policy-save2db")
+@task(name="task-dividend_policy-save2db", log_prints=True)
 def save2db(collection: Dict[str, pd.DataFrame]):
     dm = DataManager(verbose=False)
     for code, df in collection.items():
@@ -246,11 +245,11 @@ def save2db(collection: Dict[str, pd.DataFrame]):
             "cmoney.dividend_policy",
             df,
             method="upsert",
-            conflict_cols=["year", "code"]
+            conflict_cols=["year", "code"],
         )
 
 
-@task(name="task-dividend_policy-get_last_date")
+@task(name="task-dividend_policy-get_last_date", log_prints=True)
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
     last_date = dm.get_max_datetime("cmoney.dividend_policy", {}, "announcement_date")
@@ -258,7 +257,7 @@ def get_last_date() -> pd.Timestamp:
         return pd.to_datetime("1990-01-01")
     else:
         return pd.to_datetime(last_date)
-    
+
 
 @flow(
     retries=2,
@@ -271,7 +270,7 @@ def flow_dividend_policy_history():
     today = pd.Timestamp.today()
     start_date = get_last_date()
     while start_date <= today:
-        end_date = start_date + 5*pd.offsets.YearEnd()
+        end_date = start_date + 5 * pd.offsets.YearEnd()
         if end_date >= today:
             end_date = today
         logger.info(f"{start_date} ~ {end_date}")
