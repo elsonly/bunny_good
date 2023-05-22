@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS tsdb.cmoney.dividend_policy_quarterly;
 CREATE TABLE tsdb.cmoney.dividend_policy_quarterly(
     code VARCHAR(10) NOT NULL,
-    year CHAR(6) NOT NULL,
-    distribution_frequency smallint,
+    quarter CHAR(6) NOT NULL,
+    distribution_frequency VARCHAR(3),
     ex_rights_date date,
     ex_rights_last_compensation_date date,
     ex_dividend_date date,
@@ -51,11 +51,11 @@ CREATE TABLE tsdb.cmoney.dividend_policy_quarterly(
     subscription_price_for_capital_increase double precision,
     stock_allotment_for_capital_increase_shares double precision,
     total_amount_for_capital_increase INT,
-    CONSTRAINT pk_dividend_policy PRIMARY KEY (year, code)
+    CONSTRAINT pk_dividend_policy PRIMARY KEY (quarter, code)
 );
 CREATE INDEX idx_dividend_policy_quarterly_code ON tsdb.cmoney.dividend_policy_quarterly(code);
 comment on column tsdb.cmoney.dividend_policy_quarterly.code is 'stock code';
-comment on column tsdb.cmoney.dividend_policy_quarterly.year is '年度';
+comment on column tsdb.cmoney.dividend_policy_quarterly.quarter is '年季';
 comment on column tsdb.cmoney.dividend_policy_quarterly.distribution_frequency is '盈餘分派頻率';
 comment on column tsdb.cmoney.dividend_policy_quarterly.ex_rights_date is '除權日';
 comment on column tsdb.cmoney.dividend_policy_quarterly.ex_rights_last_compensation_date is '除權最後回補日';

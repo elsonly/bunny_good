@@ -10,7 +10,7 @@ class QuoteManager:
         self.cli = ShioajiClient(
             api_key=Config.SHIOAJI_API_KEY,
             api_secret=Config.SHIOAJI_SECRET,
-            simulation=False,
+            simulation=True,
         )
         self.cli.login()
 

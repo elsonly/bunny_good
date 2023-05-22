@@ -41,7 +41,7 @@ def update_workbook(
 ):
     logger = get_run_logger()
     items = {
-        "年度": "季股利政策表",
+        "年季": "季股利政策表",
         "盈餘分派頻率": "季股利政策表",
         "除權日": "季股利政策表",
         "除權最後回補日": "季股利政策表",
@@ -106,9 +106,9 @@ def update_workbook(
         logger.info("update request items...")
         idx = 3
         quarters = [
-            f"{y}Q{q}"
-            for q in range(1, 5)
+            f"{y}0{q}"
             for y in range(start_date.year, end_date.year + 1)
+            for q in range(1, 5)
         ]
         for item, table in items.items():
             for q in quarters:
@@ -134,7 +134,7 @@ def process_data() -> Dict[str, pd.DataFrame]:
     df.set_index("基準日:最近一日", inplace=True)
 
     col_map = {
-        "年度": "year",
+        "年季": "quarter",
         "盈餘分派頻率": "distribution_frequency",
         "除權日": "ex_rights_date",
         "除權最後回補日": "ex_rights_last_compensation_date",
@@ -195,44 +195,16 @@ def process_data() -> Dict[str, pd.DataFrame]:
         tmp = pd.DataFrame(index=indexes, columns=items)
         for item in items:
             tmp.loc[:, item] = tmp_rows[item][code]
-
+        
         tmp.dropna(how="all", axis=0, inplace=True)
         tmp.rename(columns=col_map, inplace=True)
-        for col in tmp.columns:
-            if col in [
-                "ex_rights_date",
-                "ex_rights_last_compensation_date",
-                "ex_dividend_date",
-                "ex_dividend_last_compensation_date",
-                "ex_rights_allotment_reference_date",
-                "ex_dividend_allotment_reference_date",
-                "share_receipt_date",
-                "dividend_receipt_date",
-                "dividend_distribution_date_approved_by_the_board_of_directors",
-                "shareholders_meeting_date",
-                "announcement_date",
-                "ex_rights_announcement_date",
-                "ex_dividend_announcement_date",
-                "rights_offering_date_for_capital_increase",
-            ]:
-                tmp.loc[pd.isnull(tmp[col]), col] = None
-
-        for col in [
-            "distribution_frequency",
-            "total_shareholders_stock_dividend_allotment_shares",
-            "total_shareholders_cash_dividend_amount",
-            "employee_compensation_stock_allotment_shares",
-            "employee_stock_allotment_amount",
-            "employee_bonus_stock_allotment_ratio_to_earnings_stock_dividend",
-            "employee_cash_compensation",
-            "directors_and_supervisors_compensation",
-            "compensation_difference",
-            "total_amount_for_capital_increase",
-        ]:
-            tmp.loc[pd.isnull(tmp[col]), col] = None
-
+        tmp = tmp.loc[~pd.isnull(tmp['quarter'])]
         if tmp.empty:
             continue
+
+        for col in tmp.columns:
+            tmp.loc[pd.isnull(tmp[col]), col] = None
+
         tmp["code"] = code
 
         collection[code] = tmp
@@ -248,7 +220,7 @@ def save2db(collection: Dict[str, pd.DataFrame]):
             "cmoney.dividend_policy_quarterly",
             df,
             method="upsert",
-            conflict_cols=["year", "code"],
+            conflict_cols=["quarter", "code"],
         )
 
 
