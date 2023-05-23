@@ -160,6 +160,17 @@ deployments[100] = Deployment.build_from_flow(
     work_pool_name="local-work",
 )
 
+deployments[101] = Deployment.build_from_flow(
+    flow=sino.flow_contracts,
+    name="sino-2",
+    version=1,
+    schedule=(CronSchedule(cron="20 8 * * *", timezone="Asia/Taipei")),
+    is_schedule_active=True,
+    tags=["twse", "sino"],
+    infra_overrides={"env": {}},
+    work_pool_name="local-work",
+)
+
 if __name__ == "__main__":
     for deployment in deployments.values():
         deployment.apply()
