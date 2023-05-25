@@ -1,17 +1,17 @@
-DROP TABLE IF EXISTS accountdb.dealer.xq_signals;
-CREATE TABLE accountdb.dealer.xq_signals(
-    id char(3),
-    sdate date,
-    stime time,
+DROP TABLE IF EXISTS accountdb.dealer.sf31_orders;
+CREATE TABLE accountdb.dealer.sf31_orders(
+    signal_id char(3),
+    sfdate date,
+    sftime time,
     strategy_id INT,
-    security_type varchar(7), -- S, F
     code varchar(10),
+    security_type varchar(7),  -- Stock
     order_type varchar(3), -- ROD, IOC, FOK
     action char(1), -- B, S
     quantity int,
     price double precision,
+    order_id varchar(10),
     CONSTRAINT fk_strategy_id
         FOREIGN KEY(strategy_id)
         REFERENCES dealer.strategy(id)
-    --CONSTRAINT pk_xq_signals PRIMARY KEY(signal_date, signal_time, code)
 );

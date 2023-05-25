@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS accountdb.dealer.xq_signals;
-CREATE TABLE accountdb.dealer.xq_signals(
-    id char(3),
+DROP TABLE IF EXISTS accountdb.dealer.exit_signals;
+CREATE TABLE accountdb.dealer.exit_signals(
+    id char(16),
     sdate date,
     stime time,
     strategy_id INT,
@@ -10,8 +10,9 @@ CREATE TABLE accountdb.dealer.xq_signals(
     action char(1), -- B, S
     quantity int,
     price double precision,
+    exit_type name,
     CONSTRAINT fk_strategy_id
         FOREIGN KEY(strategy_id)
-        REFERENCES dealer.strategy(id)
-    --CONSTRAINT pk_xq_signals PRIMARY KEY(signal_date, signal_time, code)
+        REFERENCES dealer.strategy(id),
+    CONSTRAINT pk_exit_signals PRIMARY KEY(id, sdate)
 );

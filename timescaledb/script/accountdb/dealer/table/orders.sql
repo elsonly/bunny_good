@@ -16,6 +16,7 @@ CREATE TABLE accountdb.dealer.orders(
     order_type varchar(3), -- ROD, IOC, FOK
     price_type varchar(3), -- LMT, MKT, MOP
     status varchar(10),
+    msg text,
     CONSTRAINT fk_strategy_id
         FOREIGN KEY(strategy)
         REFERENCES dealer.strategy(id)

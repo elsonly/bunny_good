@@ -13,7 +13,8 @@ returns table(
     action char(1),
     qty int,
     cost_amt double precision,
-    avg_prc double precision
+    avg_prc double precision,
+	first_entry_date date
 )
 /*
 	select * from dealer.ft_get_positions_fifo(CURRENT_DATE, 'B');
@@ -79,7 +80,9 @@ BEGIN
 	), ctePrice as(
 		select 
 			t2.strategy, t1.code, t2.price,
-			case t0.id when t1.id then t0.use_qty else t1.qty end as qty
+			case t0.id when t1.id then t0.use_qty else t1.qty end as qty,
+			-- entry_date is not good enough, If entry more than once, it may encounter some problems.
+			t0.trade_date as entry_date
 		from cteWithLastTranDate t0
 		JOIN cteReverseInSum t1 on t1.strategy = t0.strategy
 			and t1.code = t0.code 
@@ -96,7 +99,8 @@ BEGIN
 		in_action as action,
 		sum(t0.qty)::INT as qty,
 		sum(t0.price * t0.qty) * 1000 as cost_amt,
-		sum(t0.price * t0.qty) / sum(t0.qty) as avg_prc
+		sum(t0.price * t0.qty) / sum(t0.qty) as avg_prc,
+		min(entry_date) as first_entry_date
 	from ctePrice t0
 	where t0.qty > 0
 	group by t0.strategy, t0.code;

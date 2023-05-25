@@ -1,7 +1,7 @@
 
-drop function if exists dealer.ft_get_close_pnl;
+drop function if exists dealer.ft_get_closed_pnl;
 
-CREATE or replace function dealer.ft_get_close_pnl(
+CREATE or replace function dealer.ft_get_closed_pnl(
 	in_date date
 )
 returns table(
@@ -14,7 +14,7 @@ returns table(
     pnl double precision
 )
 /*
-	select * from dealer.ft_get_close_pnl(CURRENT_DATE) order by strategy, code;
+	select * from dealer.ft_get_closed_pnl(CURRENT_DATE) order by strategy, code;
 */
 
 AS $$
@@ -30,7 +30,7 @@ BEGIN
 		select t0.id, t0.strategy, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time,
 			sum(t0.qty) over (PARTITION BY t0.strategy, t0.code, t0.action order by t0.id, t0.trade_date, t0.trade_time) as rolling_qty
 		from dealer.trades t0
-		where t0.trade_date <= CURRENT_DATE
+		where t0.trade_date <= in_date
 
 	), cteRollingQty as(
 		select 
@@ -62,7 +62,7 @@ BEGIN
 			ts.to_qty as s_to_qty,
 			(
 				(case when tb.to_qty >= ts.to_qty then ts.to_qty else tb.to_qty end)
-				- (case when tb.from_qty >= ts.from_qty then tb.from_qty else tb.from_qty end)
+				- (case when tb.from_qty <= ts.from_qty then ts.from_qty else tb.from_qty end)
 			) as use_qty
 		from cteRollingQty tb
 		LEFT JOIN cteRollingQty ts on ts.action = 'S'

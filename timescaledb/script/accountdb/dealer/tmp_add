@@ -1,0 +1,5 @@
+insert into dealer.orders(trader_id, strategy, order_id, security_type, order_date, order_time, code, action, order_price, order_qty, order_type, price_type, status, msg)
+SELECT trader_id, strategy, order_id, security_type, order_date, order_time, code, action, order_price, order_qty, order_type, price_type, status, msg FROM dealer.orders_tmp order by id;
+
+insert into dealer.trades(trader_id, strategy, order_id, order_type, seqno, security_type, trade_date, trade_time, code, action, price, qty)
+SELECT trader_id, strategy, order_id, order_type, seqno, security_type, trade_date, trade_time, code, action, price, qty FROM dealer.trades_tmp order by id;

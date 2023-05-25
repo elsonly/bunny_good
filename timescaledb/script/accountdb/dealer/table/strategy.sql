@@ -8,5 +8,10 @@ CREATE TABLE accountdb.dealer.strategy(
     expected_mdd double precision,
     expected_daily_return double precision,
     holding_period int,
-    order_low_ratio double precision
+    order_low_ratio double precision,
+    exit_stop_loss double precision,
+    exit_take_profit double precision,
+    exit_dp_days int,
+    exit_dp_profit_limit double precision,
 );
+
