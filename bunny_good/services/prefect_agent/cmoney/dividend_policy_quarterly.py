@@ -24,8 +24,6 @@ def get_workbook_path() -> Path:
     return wb_path
 
 
-start_date = pd.Timestamp.now() - 2 * pd.offsets.YearBegin()
-end_date = pd.Timestamp.now()
 
 
 @task(
