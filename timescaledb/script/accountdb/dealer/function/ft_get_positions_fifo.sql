@@ -26,18 +26,18 @@ BEGIN
 	RETURN QUERY
 
 	with cteTrades as (
-		select t0.id, t0.strategy, t0.security_type, t0.code, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time
+		select t0.id, t0.strategy, t0.security_type, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time
 		from dealer.trades t0
 		where t0.trade_date <= in_date
 
 	), cteStockSum as(
 		select 
-			t0.strategy, t0.code,
+			t0.strategy, t0.code, t0.security_type,
 			case when sum(case t0.action when 'B' then 1 else -1 end * t0.qty ) >= 0 
 				then 'B' else 'S' end as action,
 			abs(sum(case t0.action when 'B' then 1 else -1 end * t0.qty )) as tot_qty
 		from cteTrades t0
-		group by t0.strategy, t0.code
+		group by t0.strategy, t0.security_type, t0.code
 
 	), cteReverseInSum as(
 		select
@@ -56,7 +56,7 @@ BEGIN
 					and tt0.id >= t0.id
 					and tt0.trade_date + tt0.trade_time >= t0.trade_date + t0.trade_time
 
-				group by t0.strategy, tt0.code
+				group by tt0.strategy, tt0.security_type, tt0.code
 			) as rolling_qty		
 		from cteTrades t0
 		where t0.action = in_action
@@ -65,7 +65,8 @@ BEGIN
 		select 
 			t1.*,
 			t0.tot_qty,
-			t0.tot_qty - (t1.rolling_qty - t1.qty)  as use_qty
+			t0.tot_qty - (t1.rolling_qty - t1.qty)  as use_qty,
+			t0.security_type
 		from cteStockSum t0
 		LEFT JOIN LATERAL (
 			select tt1.*
@@ -80,7 +81,7 @@ BEGIN
 
 	), ctePrice as(
 		select 
-			t2.strategy, t1.code, t2.price,
+			t2.strategy, t1.code, t2.price, t0.security_type,
 			case t0.id when t1.id then t0.use_qty else t1.qty end as qty,
 			-- entry_date is not good enough, If entry more than once, it may encounter some problems.
 			t0.trade_date as entry_date
@@ -105,7 +106,7 @@ BEGIN
 		min(entry_date) as first_entry_date
 	from ctePrice t0
 	where t0.qty > 0
-	group by t0.strategy, t0.code;
+	group by t0.strategy, t0.security_type, t0.code;
 
 END;
 $$ 
