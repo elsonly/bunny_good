@@ -226,7 +226,7 @@ def save2db(collection: Dict[str, pd.DataFrame]):
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
     last_date = dm.get_max_datetime(
-        "cmoney.dividend_policy_quarterly", {}, "announcement_date"
+        "cmoney.dividend_policy_quarterly", {}, "ex_dividend_date"
     )
     if last_date is None:
         return pd.to_datetime("1990-01-01")

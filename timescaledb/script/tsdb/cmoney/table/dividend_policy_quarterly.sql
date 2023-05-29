@@ -50,7 +50,7 @@ CREATE TABLE tsdb.cmoney.dividend_policy_quarterly(
     type_of_capital_increase varchar(20),
     subscription_price_for_capital_increase double precision,
     stock_allotment_for_capital_increase_shares double precision,
-    total_amount_for_capital_increase INT,
+    total_amount_for_capital_increase double precision,
     CONSTRAINT pk_dividend_policy PRIMARY KEY (quarter, code)
 );
 CREATE INDEX idx_dividend_policy_quarterly_code ON tsdb.cmoney.dividend_policy_quarterly(code);
