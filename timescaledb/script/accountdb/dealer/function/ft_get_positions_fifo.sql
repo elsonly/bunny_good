@@ -9,6 +9,7 @@ CREATE or replace function dealer.ft_get_positions_fifo(
 returns table(
 	tdate date,
     strategy int,
+	security_type char(1),
     code varchar(10),
     action char(1),
     qty int,
@@ -25,7 +26,7 @@ BEGIN
 	RETURN QUERY
 
 	with cteTrades as (
-		select t0.id, t0.strategy, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time
+		select t0.id, t0.strategy, t0.security_type, t0.code, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time
 		from dealer.trades t0
 		where t0.trade_date <= in_date
 
@@ -94,7 +95,8 @@ BEGIN
 
 	select 
 		in_date as tdate,
-		t0.strategy, 
+		t0.strategy,
+		t0.security_type, 
 		t0.code, 
 		in_action as action,
 		sum(t0.qty)::INT as qty,
