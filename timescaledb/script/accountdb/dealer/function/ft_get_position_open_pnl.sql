@@ -13,6 +13,7 @@ returns table(
     qty int,
     cost_amt double precision,
     avg_prc double precision,
+    first_entry_date date,
     close double precision,
     pnl double precision
 )
@@ -31,6 +32,7 @@ BEGIN
         t_pos.qty,
         t_pos.cost_amt,
         t_pos.avg_prc,
+        t_pos.first_entry_date,
         COALESCE(t_prc.close, t_prc_rt.close) as close,
         (
             (case t_pos.action when 'B' then 1 else -1 end)*
