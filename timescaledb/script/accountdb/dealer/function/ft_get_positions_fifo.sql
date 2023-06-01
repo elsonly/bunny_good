@@ -26,22 +26,27 @@ BEGIN
 	RETURN QUERY
 
 	with cteTrades as (
-		select t0.id, t0.strategy, t0.security_type, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time
+		select t0.id, t0.strategy, t0.security_type, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time,
+			row_number() over(
+				PARTITION by t0.strategy, t0.security_type, t0.code 
+				order by (t0.trade_date + t0.trade_time), t0.id
+			) as rid
 		from dealer.trades t0
 		where t0.trade_date <= in_date
 
 	), cteStockSum as(
 		select 
 			t0.strategy, t0.code, t0.security_type,
-			case when sum(case t0.action when 'B' then 1 else -1 end * t0.qty ) >= 0 
-				then 'B' else 'S' end as action,
-			abs(sum(case t0.action when 'B' then 1 else -1 end * t0.qty )) as tot_qty
+			case when sum(case t0.action when in_action then 1 else -1 end * t0.qty ) >= 0 
+				then in_action else 'S' end as action,
+			abs(sum(case t0.action when in_action then 1 else -1 end * t0.qty )) as tot_qty
 		from cteTrades t0
 		group by t0.strategy, t0.security_type, t0.code
 
 	), cteReverseInSum as(
 		select
 			t0.id,
+			t0.rid,
 			t0.trade_date, 
 			t0.trade_time, 
 			t0.strategy,
@@ -53,7 +58,7 @@ BEGIN
 				where tt0.strategy = t0.strategy
 					and tt0.code = t0.code
 					and tt0.action = t0.action
-					and tt0.id >= t0.id
+					and tt0.rid >= t0.rid
 					and tt0.trade_date + tt0.trade_time >= t0.trade_date + t0.trade_time
 
 				group by tt0.strategy, tt0.security_type, tt0.code
@@ -89,7 +94,7 @@ BEGIN
 		JOIN cteReverseInSum t1 on t1.strategy = t0.strategy
 			and t1.code = t0.code 
 			and t1.trade_date + t1.trade_time>= t0.trade_date + t0.trade_time
-			and t1.id >= t0.id
+			and t1.rid >= t0.rid
 		LEFT JOIN cteTrades t2 on t2.id = t1.id
 
 	)
