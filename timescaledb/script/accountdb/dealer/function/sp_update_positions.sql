@@ -18,9 +18,11 @@ BEGIN
 		RAISE NOTICE 'date: %', t_row.tdate;
 
 		insert into dealer.positions(
-			tdate, strategy, code, action, qty, cost_amt, avg_prc, close, pnl
+			tdate, strategy, code, action, qty, cost_amt, avg_prc, close, pnl, first_entry_date
 		)
-			select * from dealer.ft_get_position_open_pnl(t_row.tdate, false);
+			select tdate, strategy, code, action, 
+				qty, cost_amt, avg_prc, close, pnl, first_entry_date 
+			from dealer.ft_get_position_open_pnl(t_row.tdate, false);
 
     END LOOP;
 END;
