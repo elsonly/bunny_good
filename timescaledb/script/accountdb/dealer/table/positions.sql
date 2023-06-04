@@ -10,6 +10,7 @@ CREATE TABLE accountdb.dealer.positions(
     close double precision,
     pnl double precision,
     first_entry_date date,
+    security_type char(1),
     CONSTRAINT fk_strategy FOREIGN KEY(strategy) REFERENCES dealer.strategy(id)
 );
 CREATE INDEX idx_positions_date ON accountdb.dealer.positions(tdate);

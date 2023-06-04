@@ -12,16 +12,17 @@ BEGIN
         select distinct tdate 
 		-- TODO: change source table for trading dates
         from cmoney.institute_invest 
-        where tdate > CURRENT_DATE-20
+        where tdate > CURRENT_DATE - 60
             and tdate not in (select distinct tdate from dealer.positions)
     ) LOOP
 		RAISE NOTICE 'date: %', t_row.tdate;
 
 		insert into dealer.positions(
-			tdate, strategy, code, action, qty, cost_amt, avg_prc, close, pnl, first_entry_date
+			tdate, strategy, code, action, qty, cost_amt, avg_prc, 
+			close, pnl, first_entry_date, security_type
 		)
 			select tdate, strategy, code, action, 
-				qty, cost_amt, avg_prc, close, pnl, first_entry_date 
+				qty, cost_amt, avg_prc, close, pnl, first_entry_date, security_type
 			from dealer.ft_get_position_open_pnl(t_row.tdate, false);
 
     END LOOP;

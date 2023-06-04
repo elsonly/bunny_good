@@ -8,6 +8,7 @@ CREATE or replace function dealer.ft_get_position_open_pnl(
 returns table(
 	tdate date,
     strategy int,
+    security_type char(1),
     code varchar(10),
     action char(1),
     qty int,
@@ -27,6 +28,7 @@ BEGIN
     select 
         t_pos.tdate,
         t_pos.strategy,
+        t_pos.security_type,
         t_pos.code,
         t_pos.action,
         t_pos.qty,
