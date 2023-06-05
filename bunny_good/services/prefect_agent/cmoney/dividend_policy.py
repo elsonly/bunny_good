@@ -283,8 +283,10 @@ def flow_dividend_policy_history():
 @flow(
     retries=2,
     retry_delay_seconds=30,
+    timeout_seconds=1200,
     task_runner=SequentialTaskRunner(),
-    on_failure=flow_error_handle,
+    on_failure=[flow_error_handle],
+    on_crashed=[flow_error_handle],
 )
 def flow_dividend_policy():
     logger = get_run_logger()
