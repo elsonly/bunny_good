@@ -142,35 +142,28 @@ def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
     last_date = dm.get_max_datetime("cmoney.holidays", {}, "hdate")
     if last_date is None:
-        return pd.to_datetime("2009-01-01")
+        return pd.to_datetime("2017-01-01")
     else:
         return pd.to_datetime(last_date)
-
-
-@task(name="task-holidays-get_trading_dates", log_prints=True)
-def get_trading_dates() -> List[pd.Timestamp]:
-    dm = DataManager(verbose=False)
-    tdates = [pd.to_datetime(x) for x in dm.get_twse_trading_dates()]
-    return tdates
 
 
 @flow(
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),
-    on_failure=flow_error_handle,
+    on_failure=[flow_error_handle],
+    on_crashed=[flow_error_handle],
 )
 def flow_holidays_history():
     logger = get_run_logger()
-    today = pd.Timestamp.today() + 2 * pd.offsets.YearEnd()
+    today = pd.Timestamp.today() + 10 * pd.offsets.YearEnd()
     start_date = get_last_date() + pd.offsets.Day()
-    trading_dates = get_trading_dates()
     while start_date <= today:
         end_date = start_date + 5 * pd.offsets.YearEnd()
         if end_date >= today:
             end_date = today
         logger.info(f"{start_date} ~ {end_date}")
-        update_workbook(start_date, end_date, periods=trading_dates, validate_date=True)
+        update_workbook(start_date, end_date)
         collections = process_data()
         save2db(collections)
         start_date = end_date + pd.offsets.YearBegin()
@@ -186,7 +179,7 @@ def flow_holidays_history():
 )
 def flow_holidays():
     logger = get_run_logger()
-    end_date = pd.Timestamp.today() + 2 * pd.offsets.YearEnd()
+    end_date = pd.Timestamp.today() + 10 * pd.offsets.YearEnd()
     start_date = pd.Timestamp.today() - pd.offsets.YearEnd()
     logger.info(f"{start_date} ~ {end_date}")
     update_workbook(start_date, end_date)
