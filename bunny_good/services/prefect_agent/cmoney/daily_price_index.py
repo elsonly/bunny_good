@@ -17,7 +17,7 @@ def get_workbook_path() -> Path:
         wb_path = (
             Path()
             .absolute()
-            .joinpath("bunny_good/services/prefect_agent/cmoney/docs/daily_price.xlsm")
+            .joinpath("bunny_good/services/prefect_agent/cmoney/docs/daily_price_index.xlsm")
         )
     return wb_path
 
@@ -30,6 +30,8 @@ def update_workbook(
     validate_date: bool = False,
 ):
     def get_validate_date(tdate: pd.Timestamp) -> pd.Timestamp:
+        if tdate < pd.to_datetime("1997-02-01"):
+            return tdate
         if not validate_date or not periods:
             return tdate
 
@@ -48,14 +50,12 @@ def update_workbook(
         "成交量": "日收盤表排行",
         "成交筆數": "日收盤表排行",
         "成交金額(千)": "日收盤表排行",
-        "成交值比重(%)": "日收盤表排行",
         "股本(百萬)": "日收盤表排行",
         "總市值(億)": "日收盤表排行",
         "本益比": "日收盤表排行",
         "股價淨值比": "日收盤表排行",
         "本益比(近四季)": "日收盤表排行",
         "週轉率(%)": "日收盤表排行",
-        "漲跌停": "日收盤表排行",
     }
     wb_path = get_workbook_path()
     logger.info(wb_path)
@@ -65,7 +65,7 @@ def update_workbook(
         sh = wb.sheets("工作表1")
 
         logger.info("clear contents...")
-        rng = sh.range("A3:DIZ10000")
+        rng = sh.range("A3:CNZ10000")
         rng.delete()
 
         logger.info("update request items...")
@@ -104,14 +104,12 @@ def process_data() -> Dict[str, pd.DataFrame]:
         "成交量": "volume",
         "成交筆數": "cnt",
         "成交金額(千)": "amt",
-        "成交值比重(%)": "amt_ratio",
         "股本(百萬)": "shares",
         "總市值(億)": "market_value",
         "本益比": "pe",
         "股價淨值比": "pb",
         "本益比(近四季)": "pe_4q",
         "週轉率(%)": "turnover",
-        "漲跌停": "up_down_limit",
     }
     item_start_idx = 8
     items = df.iloc[1:, 3].str[item_start_idx:].unique()
@@ -131,7 +129,7 @@ def process_data() -> Dict[str, pd.DataFrame]:
         tmp["tdate"] = pd.to_datetime(tmp.index)
         tmp["code"] = code
 
-        for col in ["volume", "cnt", "shares", "amt", "up_down_limit"]:
+        for col in ["volume", "cnt", "shares", "amt"]:
             tmp.loc[pd.isnull(tmp[col]), col] = None
 
         for col in [
@@ -143,7 +141,6 @@ def process_data() -> Dict[str, pd.DataFrame]:
             "pb",
             "pe_4q",
             "turnover",
-            "amt_ratio",
             "market_value",
         ]:
             tmp.loc[:, col] = tmp.loc[:, col].astype(float)
@@ -169,7 +166,7 @@ def save2db(collection: Dict[str, pd.DataFrame]):
 @task(log_prints=True)
 def get_last_date() -> pd.Timestamp:
     dm = DataManager(verbose=False)
-    last_date = dm.get_max_datetime("cmoney.daily_price", {}, "tdate")
+    last_date = dm.get_max_datetime("cmoney.daily_price", {"code": "TWA00"}, "tdate")
     if last_date is None:
         return pd.to_datetime("1990-01-01")
     else:
@@ -189,7 +186,7 @@ def get_trading_dates() -> List[pd.Timestamp]:
     task_runner=SequentialTaskRunner(),
     on_failure=flow_error_handle,
 )
-def flow_daily_price_history():
+def flow_daily_price_index_history():
     logger = get_run_logger()
     today = pd.Timestamp.today()
     start_date = get_last_date() + pd.offsets.Day()
@@ -213,7 +210,7 @@ def flow_daily_price_history():
     on_failure=[flow_error_handle],
     on_crashed=[flow_error_handle],
 )
-def flow_daily_price():
+def flow_daily_price_index():
     logger = get_run_logger()
     end_date = pd.Timestamp.today()
     start_date = end_date - 5 * pd.offsets.BDay()

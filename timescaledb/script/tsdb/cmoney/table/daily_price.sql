@@ -8,9 +8,9 @@ CREATE TABLE tsdb.cmoney.daily_price(
     close double precision,
     volume bigint,
     cnt bigint, 
-    amt bigint, -- in thousands
+    amt double precision, -- in thousands
     amt_ratio double precision,
-    shares bigint, -- in million
+    shares DOUBLE precision, -- in million
     market_value double precision, -- in 1000 m
     pe double precision,
     pb double precision,
