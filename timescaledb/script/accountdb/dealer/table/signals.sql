@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS accountdb.dealer.signals;
 CREATE TABLE accountdb.dealer.signals(
-    id char(3),
+    id varchar(16),
     source name,
     sdate date,
     stime time,

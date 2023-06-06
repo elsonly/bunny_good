@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS accountdb.dealer.sf31_orders;
 CREATE TABLE accountdb.dealer.sf31_orders(
     id BIGSERIAL PRIMARY KEY,
-    signal_id char(3),
+    signal_id varchar(16),
     sfdate date,
     sftime time,
     strategy_id INT,
