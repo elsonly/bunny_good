@@ -1,11 +1,11 @@
 DROP TABLE IF EXISTS accountdb.dealer.strategy;
 CREATE TABLE accountdb.dealer.strategy(
     id SERIAL PRIMARY KEY,
-    name varchar,
+    name varchar not null,
     factor name,
-    add_date date DEFAULT CURRENT_DATE,
-    status boolean,
-    enable_raise boolean,
+    add_date date not null DEFAULT CURRENT_DATE,
+    status boolean not null DEFAULT false,
+    enable_raise boolean not null DEFAULT false,
     leverage_ratio double precision,
     expected_mdd double precision,
     expected_daily_return double precision,
