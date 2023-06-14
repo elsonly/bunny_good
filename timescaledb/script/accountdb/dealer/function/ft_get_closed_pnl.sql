@@ -73,7 +73,7 @@ BEGIN
 		LEFT JOIN cteRollingQty ts on ts.action = 'S'
 			and ts.strategy = tb.strategy
 			and ts.code = tb.code
-			and tb.to_qty >= ts.from_qty
+			and tb.to_qty > ts.from_qty
 			and tb.from_qty < ts.to_qty
 		where tb.action = 'B' and ts.from_qty is not NULL
 
