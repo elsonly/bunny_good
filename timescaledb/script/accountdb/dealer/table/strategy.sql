@@ -6,6 +6,7 @@ CREATE TABLE accountdb.dealer.strategy(
     add_date date not null DEFAULT CURRENT_DATE,
     status boolean not null DEFAULT false,
     enable_raise boolean not null DEFAULT false,
+    enable_dividend boolean not null DEFAULT false,
     leverage_ratio double precision,
     expected_mdd double precision,
     expected_daily_return double precision,

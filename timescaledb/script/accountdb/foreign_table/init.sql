@@ -11,3 +11,5 @@ create SCHEMA sino;
 create SCHEMA cmoney;
 IMPORT FOREIGN SCHEMA sino FROM SERVER tsdb_server INTO sino;
 IMPORT FOREIGN SCHEMA cmoney FROM SERVER tsdb_server INTO cmoney;
+IMPORT FOREIGN SCHEMA cmoney LIMIT TO (v_coming_dividends) FROM SERVER tsdb_server INTO cmoney;
+ALTER FOREIGN TABLE cmoney.v_coming_dividends OWNER TO chiubj;
