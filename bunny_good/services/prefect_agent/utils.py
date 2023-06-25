@@ -1,7 +1,7 @@
 from prefect.states import get_state_exception
 from prefect.flows import FlowRun
 from prefect import Flow, State
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from bunny_good.alert_manager import AlertManager
 
@@ -17,3 +17,7 @@ def flow_error_handle(flow: Flow, flow_run: FlowRun, state: State):
     )
     print(msg)
     am.send_alert(title, msg)
+
+
+def get_tpe_datetime() -> datetime:
+    return datetime.utcnow() + timedelta(hours=8)

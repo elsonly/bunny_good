@@ -5,7 +5,7 @@ import shioaji as sj
 import time
 
 from bunny_good.database.data_manager import DataManager
-from bunny_good.services.prefect_agent.utils import flow_error_handle
+from bunny_good.services.prefect_agent.utils import flow_error_handle, get_tpe_datetime
 from bunny_good.config import Config
 
 
@@ -32,8 +32,8 @@ def fetch_contracts() -> pd.DataFrame:
 
     logger.info(f"Contract Date: {update_date}")
     if (
-        pd.Timestamp.now().date() != pd.to_datetime(update_date).date()
-        and pd.Timestamp.now().weekday() < 5
+        get_tpe_datetime().date() != pd.to_datetime(update_date).date()
+        and get_tpe_datetime().weekday() < 5
     ):
         raise Exception(f"Invalid Contract Date: {update_date}")
 
@@ -56,7 +56,8 @@ def save2db(df: pd.DataFrame):
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),
-    on_failure=flow_error_handle,
+    on_failure=[flow_error_handle],
+    on_crashed=[flow_error_handle],
 )
 def flow_contracts():
     df = fetch_contracts()

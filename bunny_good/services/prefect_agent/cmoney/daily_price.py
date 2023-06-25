@@ -187,7 +187,8 @@ def get_trading_dates() -> List[pd.Timestamp]:
     retries=2,
     retry_delay_seconds=30,
     task_runner=SequentialTaskRunner(),
-    on_failure=flow_error_handle,
+    on_failure=[flow_error_handle],
+    on_crashed=[flow_error_handle],
 )
 def flow_daily_price_history():
     logger = get_run_logger()
