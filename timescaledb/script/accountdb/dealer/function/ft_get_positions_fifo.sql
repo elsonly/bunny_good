@@ -37,9 +37,9 @@ BEGIN
 	), cteStockSum as(
 		select 
 			t0.strategy, t0.code, t0.security_type,
-			case when sum(case t0.action when in_action then 1 else -1 end * t0.qty ) >= 0 
-				then in_action else 'S' end as action,
-			abs(sum(case t0.action when in_action then 1 else -1 end * t0.qty )) as tot_qty
+			case when sum(case t0.action when 'B' then 1 else -1 end * t0.qty ) >= 0 
+				then 'B' else 'S' end as action,
+			abs(sum(case t0.action when 'B' then 1 else -1 end * t0.qty )) as tot_qty
 		from cteTrades t0
 		group by t0.strategy, t0.security_type, t0.code
 
