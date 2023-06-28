@@ -77,6 +77,7 @@ class ShioajiClient:
             self.__api_secret,
             fetch_contract=False,
             subscribe_trade=False,
+            receive_window=300000
         )
         self.api.fetch_contracts(contract_download=True)
         time.sleep(10)
