@@ -2,20 +2,40 @@ import datetime as dt
 from typing import Dict, List
 import pandas as pd
 from loguru import logger
+from enum import Enum
 
 from bunny_good.database.tsdb_client import TSDBClient
 from bunny_good.config import Config
 
 
+class DataManagerType(Enum):
+    QUOTE = "Quote"
+    PREFECT = "Prefect"
+
+
 class DataManager:
-    def __init__(self, verbose: bool = True):
-        self.cli = TSDBClient(
-            host=Config.DB_HOST,
-            port=Config.DB_PORT,
-            user=Config.DB_USER,
-            password=Config.DB_PASSWORD,
-            db=Config.DB_DATABASE,
-        )
+    def __init__(
+        self, verbose: bool = True, dm_type: DataManagerType = DataManagerType.PREFECT
+    ):
+        if dm_type == DataManagerType.QUOTE:
+            self.cli = TSDBClient(
+                host=Config.DB_QUOTE_HOST,
+                port=Config.DB_QUOTE_PORT,
+                user=Config.DB_QUOTE_USER,
+                password=Config.DB_QUOTE_PASSWORD,
+                db=Config.DB_QUOTE_DATABASE,
+            )
+        elif dm_type == DataManagerType.PREFECT:
+            self.cli = TSDBClient(
+                host=Config.DB_PREFECT_HOST,
+                port=Config.DB_PREFECT_PORT,
+                user=Config.DB_PREFECT_USER,
+                password=Config.DB_PREFECT_PASSWORD,
+                db=Config.DB_PREFECT_DATABASE,
+            )
+        else:
+            raise Exception(f"Invalid Data Manager Type {dm_type}")
+        self.type = dm_type
         self.verbose = verbose
 
     def convert_condition_to_sql_string(self, conditions: dict) -> str:

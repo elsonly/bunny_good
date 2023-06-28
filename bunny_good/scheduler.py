@@ -6,7 +6,8 @@ import pandas as pd
 from loguru import logger
 
 from bunny_good.quote.quote_manager import QuoteManager
-from bunny_good.database.data_manager import DataManager
+from bunny_good.database.data_manager import DataManager, DataManagerType
+from bunny_good.alert_manager import AlertManager
 from bunny_good.config import Config
 
 
@@ -25,7 +26,8 @@ class Schedule(TypedDict):
 class Scheduler:
     def __init__(self, verbose: bool = True):
         self.qm = QuoteManager()
-        self.dm = DataManager(verbose)
+        self.dm = DataManager(verbose, dm_type=DataManagerType.QUOTE)
+        self.alert_manager = AlertManager()
         self.__active_schedule = False
         self.schedules: Dict[ScheduleJobs, Schedule] = {}
 
@@ -56,11 +58,19 @@ class Scheduler:
         while self.__active_schedule:
             cur_dt = datetime.utcnow()
             for job, schedule in self.schedules.items():
-                if cur_dt >= schedule["next_dt"]:
-                    if job == ScheduleJobs.Snapshots:
-                        self._job_snapshots()
-                        schedule["prev_dt"] = cur_dt
-                        schedule["next_dt"] = cur_dt + schedule["interval"]
+                try:
+                    if cur_dt >= schedule["next_dt"]:
+                        if job == ScheduleJobs.Snapshots:
+                            self._job_snapshots()
+
+                except Exception as e:
+                    logger.exception(e)
+                    self.alert_manager.send_alert(
+                        title=f"{job} failed", content=f"{schedule} | failed"
+                    )
+
+                schedule["prev_dt"] = cur_dt
+                schedule["next_dt"] = cur_dt + schedule["interval"]
 
             time.sleep(0.1)
 

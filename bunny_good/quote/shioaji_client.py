@@ -19,7 +19,7 @@ def api_wrapper(retries: int = 1, retry_wait: int = 3):
                 except Exception as e:
                     exc = e
                     logger.error(f"func: {func.__name__} | failed | retry: {k}")
-                    logger.exception(e)
+                    logger.error(e)
                     time.sleep(retry_wait)
             raise exc
 

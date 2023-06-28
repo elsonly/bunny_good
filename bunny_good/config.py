@@ -10,13 +10,18 @@ class BaseConfig:
     """Base config, uses staging database server."""
 
     TESTING = True
-    DB_HOST = "localhost"
-    DB_PORT = 5432
-    DB_USER = ""
-    DB_PASSWORD = ""
-    DB_DATABASE = ""
+    DB_QUOTE_HOST = "localhost"
+    DB_QUOTE_PORT = 5432
+    DB_QUOTE_USER = ""
+    DB_QUOTE_PASSWORD = ""
+    DB_QUOTE_DATABASE = ""
     SHIOAJI_API_KEY = ""
     SHIOAJI_SECRET = ""
+    DB_PREFECT_HOST = "127.0.0.1"
+    DB_PREFECT_PORT = 5432
+    DB_PREFECT_USER = ""
+    DB_PREFECT_PASSWORD = ""
+    DB_PREFECT_DATABASE = ""
     GMAIL_MAIL = ""
     GMAIL_API_KEY = ""
     GMAIL_ALERT_TO = ""
@@ -26,13 +31,24 @@ class ProductionConfig(BaseConfig):
     """Uses production database server."""
 
     TESTING = False
-    DB_HOST = os.environ.get("DB_HOST")
-    DB_PORT = int(os.environ.get("DB_PORT")) if os.environ.get("DB_PORT") else 0
-    DB_USER = os.environ.get("DB_USER")
-    DB_PASSWORD = os.environ.get("DB_PASSWORD")
-    DB_DATABASE = os.environ.get("DB_DATABASE")
+    DB_QUOTE_HOST = os.environ.get("DB_QUOTE_HOST")
+    DB_QUOTE_PORT = (
+        int(os.environ.get("DB_QUOTE_PORT")) if os.environ.get("DB_QUOTE_PORT") else 0
+    )
+    DB_QUOTE_USER = os.environ.get("DB_QUOTE_USER")
+    DB_QUOTE_PASSWORD = os.environ.get("DB_QUOTE_PASSWORD")
+    DB_QUOTE_DATABASE = os.environ.get("DB_QUOTE_DATABASE")
     SHIOAJI_API_KEY = os.environ.get("SHIOAJI_API_KEY")
     SHIOAJI_SECRET = os.environ.get("SHIOAJI_SECRET")
+    DB_PREFECT_HOST = os.environ.get("DB_PREFECT_HOST")
+    DB_PREFECT_PORT = (
+        int(os.environ.get("DB_PREFECT_PORT"))
+        if os.environ.get("DB_PREFECT_PORT")
+        else 0
+    )
+    DB_PREFECT_USER = os.environ.get("DB_PREFECT_USER")
+    DB_PREFECT_PASSWORD = os.environ.get("DB_PREFECT_PASSWORD")
+    DB_PREFECT_DATABASE = os.environ.get("DB_PREFECT_DATABASE")
     GMAIL_MAIL = os.environ.get("GMAIL_MAIL")
     GMAIL_API_KEY = os.environ.get("GMAIL_API_KEY")
     GMAIL_ALERT_TO = os.environ.get("GMAIL_ALERT_TO")
@@ -40,13 +56,24 @@ class ProductionConfig(BaseConfig):
 
 class DevelopmentConfig(BaseConfig):
     TESTING = False
-    DB_HOST = os.environ.get("DB_HOST")
-    DB_PORT = int(os.environ.get("DB_PORT")) if os.environ.get("DB_PORT") else 0
-    DB_USER = os.environ.get("DB_USER")
-    DB_PASSWORD = os.environ.get("DB_PASSWORD")
-    DB_DATABASE = os.environ.get("DB_DATABASE")
+    DB_QUOTE_HOST = os.environ.get("DB_QUOTE_HOST")
+    DB_QUOTE_PORT = (
+        int(os.environ.get("DB_QUOTE_PORT")) if os.environ.get("DB_QUOTE_PORT") else 0
+    )
+    DB_QUOTE_USER = os.environ.get("DB_QUOTE_USER")
+    DB_QUOTE_PASSWORD = os.environ.get("DB_QUOTE_PASSWORD")
+    DB_QUOTE_DATABASE = os.environ.get("DB_QUOTE_DATABASE")
     SHIOAJI_API_KEY = os.environ.get("SHIOAJI_API_KEY")
     SHIOAJI_SECRET = os.environ.get("SHIOAJI_SECRET")
+    DB_PREFECT_HOST = os.environ.get("DB_PREFECT_HOST")
+    DB_PREFECT_PORT = (
+        int(os.environ.get("DB_PREFECT_PORT"))
+        if os.environ.get("DB_PREFECT_PORT")
+        else 0
+    )
+    DB_PREFECT_USER = os.environ.get("DB_PREFECT_USER")
+    DB_PREFECT_PASSWORD = os.environ.get("DB_PREFECT_PASSWORD")
+    DB_PREFECT_DATABASE = os.environ.get("DB_PREFECT_DATABASE")
     GMAIL_MAIL = os.environ.get("GMAIL_MAIL")
     GMAIL_API_KEY = os.environ.get("GMAIL_API_KEY")
     GMAIL_ALERT_TO = os.environ.get("GMAIL_ALERT_TO")
