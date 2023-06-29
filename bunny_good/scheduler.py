@@ -58,19 +58,19 @@ class Scheduler:
         while self.__active_schedule:
             cur_dt = datetime.utcnow()
             for job, schedule in self.schedules.items():
-                try:
-                    if cur_dt >= schedule["next_dt"]:
+                if cur_dt >= schedule["next_dt"]:
+                    try:
                         if job == ScheduleJobs.Snapshots:
                             self._job_snapshots()
 
-                except Exception as e:
-                    logger.exception(e)
-                    self.alert_manager.send_alert(
-                        title=f"{job} failed", content=f"{schedule} | failed"
-                    )
+                    except Exception as e:
+                        logger.exception(e)
+                        self.alert_manager.send_alert(
+                            title=f"{job} failed", content=f"{schedule} | failed"
+                        )
 
-                schedule["prev_dt"] = cur_dt
-                schedule["next_dt"] = cur_dt + schedule["interval"]
+                    schedule["prev_dt"] = cur_dt
+                    schedule["next_dt"] = cur_dt + schedule["interval"]
 
             time.sleep(0.1)
 
