@@ -164,3 +164,13 @@ class DataManager:
             return []
         tdates = df["tdate"].tolist()
         return tdates
+
+    def get_twse_stock_list(self) -> List[str]:
+        sql = """
+            select code
+            from tsdb.sino.contracts
+            where length(code) = 4
+                and security_type = 'STK'
+        """
+        df = self.cli.execute_query(sql, out_type="df")
+        return df["code"].tolist()

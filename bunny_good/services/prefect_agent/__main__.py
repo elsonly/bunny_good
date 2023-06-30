@@ -189,6 +189,16 @@ deployments[101] = Deployment.build_from_flow(
     infra_overrides={"env": {}},
     work_pool_name="local-work",
 )
+deployments[102] = Deployment.build_from_flow(
+    flow=sino.flow_kbars,
+    name="kbars",
+    version=1,
+    schedule=(CronSchedule(cron="0 0 * * *", timezone="Asia/Taipei")),
+    is_schedule_active=True,
+    tags=["twse", "sino"],
+    infra_overrides={"env": {}},
+    work_pool_name="local-work",
+)
 
 if __name__ == "__main__":
     for deployment in deployments.values():
