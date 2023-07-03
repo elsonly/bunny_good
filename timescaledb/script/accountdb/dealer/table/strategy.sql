@@ -8,6 +8,7 @@ CREATE TABLE accountdb.dealer.strategy(
     enable_raise boolean not null DEFAULT false,
     enable_dividend boolean not null DEFAULT false,
     leverage_ratio double precision,
+    order_amount int,
     expected_mdd double precision,
     expected_daily_return double precision,
     holding_period int,
