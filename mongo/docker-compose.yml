@@ -1,0 +1,58 @@
+version: '3.7'
+
+services:
+  mongo:
+    hostname: mongo
+    image: mongo:7.0.0-rc6
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: bunnygood
+    volumes:
+      - mongodb:/data/db
+    deploy:
+      resources:
+        limits:
+          memory: 12g
+        reservations:
+          memory: 2g
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    privileged: true
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}"
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - bunny-net
+
+  mongo-express:
+    image: mongo-express:1.0.0-alpha.4
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongoadmin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: bunnygood
+      ME_CONFIG_MONGODB_URL: mongodb://mongoadmin:bunnygood@mongo:27017/
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}"
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - bunny-net
+
+volumes:
+  mongodb:
+
+networks:
+  bunny-net:
+    external: true
