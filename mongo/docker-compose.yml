@@ -41,6 +41,8 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: mongoadmin
       ME_CONFIG_MONGODB_ADMINPASSWORD: bunnygood
       ME_CONFIG_MONGODB_URL: mongodb://mongoadmin:bunnygood@mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: chiubj
+      ME_CONFIG_BASICAUTH_PASSWORD: bunnygood
     logging:
       driver: json-file
       options:
