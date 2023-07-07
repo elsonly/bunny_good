@@ -15,9 +15,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 12g
+          memory: 24g
         reservations:
-          memory: 2g
+          memory: 4g
     ulimits:
       nofile:
         soft: 262144
