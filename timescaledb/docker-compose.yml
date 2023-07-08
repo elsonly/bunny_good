@@ -4,6 +4,7 @@ services:
   timescaledb:
     hostname: timescaledb
     image: timescale/timescaledb-ha:pg14.7-ts2.10.3-all
+    #image: tsdb-data:latest
     ports:
       - 5432:5432
     environment:
@@ -11,7 +12,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: tsdb
     volumes:
-      - timescaledb:/var/lib/postgresql/data
+      - timescaledb:/home/postgres/pgdata/data
     deploy:
       resources:
         limits:
@@ -44,6 +45,10 @@ services:
       PGADMIN_CONFIG_MAX_SESSION_IDLE_TIME: 60
     volumes:
       - pgadmin4-data:/var/lib/pgadmin
+    deploy:
+      resources:
+        limits:
+          memory: 4g
     ports:
       - "5050:80"
     logging:
