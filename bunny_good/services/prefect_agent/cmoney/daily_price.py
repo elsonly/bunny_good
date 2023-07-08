@@ -32,7 +32,8 @@ def update_workbook(
     def get_validate_date(tdate: pd.Timestamp) -> pd.Timestamp:
         if not validate_date or not periods:
             return tdate
-
+        if tdate < pd.to_datetime("1997-02-01"):
+            return tdate
         while tdate <= periods[-1]:
             if tdate in periods:
                 return tdate
