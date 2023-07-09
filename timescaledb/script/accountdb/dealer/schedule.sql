@@ -8,7 +8,7 @@ SELECT add_job(
     timezone => 'Asia/Taipei'
 );
 
-CALL run_job(1002);
+CALL run_job(1001);
 -- select * from dealer.positions where tdate = CURRENT_DATE;
 -- truncate table dealer.positions
 
@@ -20,6 +20,6 @@ SELECT add_job(
     timezone => 'Asia/Taipei'
 );
 
-CALL run_job(1003);
+CALL run_job(1002);
 -- select * from dealer.cashflow order by tdate desc limit 10;
 -- truncate table dealer.cashflow

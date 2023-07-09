@@ -32,28 +32,33 @@ BEGIN
 			t0.avg_prc as price, t0.qty,
 			t0.first_entry_date as trade_date,
 			'13:30:00'::time as trade_time,
-			0 as rid
+			0 as rid,
+			t0.tdate
 		from dealer.positions t0
 		where t0.tdate = (select max(tt0.tdate) from dealer.positions tt0 where tt0.tdate < in_date)
 
 	), cteTrades as (
-		select t_pos.* from ctePosition t_pos
+		select t0.id, t0.strategy, t0.security_type, t0.code, t0.action, 
+			t0.price, t0.qty, t0.trade_date, t0.trade_time, t0.rid
+		from ctePosition t0
+		
 		UNION ALL
-		select t0.id, t0.strategy, t0.security_type, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time,
+		select t0.id, t0.strategy, t0.security_type, t0.code, t0.action, 
+			t0.price, t0.qty, t0.trade_date, t0.trade_time,
 			row_number() over(
 				PARTITION by t0.strategy, t0.security_type, t0.code 
 				order by (t0.trade_date + t0.trade_time), t0.id
 			) as rid
 		from dealer.trades t0
 		where t0.trade_date <= in_date
-			and t0.trade_date > (select max(tt0.tdate) from dealer.positions tt0 where tt0.tdate < in_date)
+			and t0.trade_date > (select max(tt0.tdate) from ctePosition tt0)
 
 	), cteStockSum as(
 		select 
 			t0.strategy, t0.code, t0.security_type,
-			case when sum(case t0.action when in_action then 1 else -1 end * t0.qty ) >= 0 
-				then in_action else 'S' end as action,
-			abs(sum(case t0.action when in_action then 1 else -1 end * t0.qty )) as tot_qty
+			case when sum(case t0.action when 'B' then 1 else -1 end * t0.qty ) >= 0 
+				then 'B' else 'S' end as action,
+			abs(sum(case t0.action when 'B' then 1 else -1 end * t0.qty )) as tot_qty
 		from cteTrades t0
 		group by t0.strategy, t0.security_type, t0.code
 

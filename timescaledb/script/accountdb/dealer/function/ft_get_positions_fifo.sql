@@ -3,8 +3,9 @@ drop function if exists dealer.ft_get_positions_fifo;
 
 CREATE or replace function dealer.ft_get_positions_fifo(
 	in_date date,
-	in_action char(1) 	-- B: long position, 
+	in_action char(1), 	-- B: long position, 
 						-- S: short position
+	is_concat boolean default true
 )
 returns table(
 	tdate date,
@@ -19,20 +20,41 @@ returns table(
 )
 /*
 	select * from dealer.ft_get_positions_fifo(CURRENT_DATE, 'B');
+	select * from dealer.ft_get_positions_fifo(CURRENT_DATE, 'B', true);
 */
 
 AS $$
 BEGIN
 	RETURN QUERY
 
-	with cteTrades as (
-		select t0.id, t0.strategy, t0.security_type, t0.code, t0.action, t0.price, t0.qty, t0.trade_date, t0.trade_time,
+	with ctePosition as (
+		select 
+			-1*row_number() over(order by t0.first_entry_date) as id,
+			t0.strategy, t0.security_type, t0.code, t0.action, 
+			t0.avg_prc as price, t0.qty,
+			t0.first_entry_date as trade_date,
+			'13:30:00'::time as trade_time,
+			0 as rid,
+			t0.tdate
+		from dealer.positions t0
+		where is_concat
+			and t0.tdate = (select max(tt0.tdate) from dealer.positions tt0 where tt0.tdate < in_date)
+	
+	), cteTrades as (
+		select t0.id, t0.strategy, t0.security_type, t0.code, t0.action, 
+			t0.price, t0.qty, t0.trade_date, t0.trade_time, t0.rid
+		from ctePosition t0
+		
+		UNION ALL
+		select t0.id, t0.strategy, t0.security_type, t0.code, t0.action, 
+			t0.price, t0.qty, t0.trade_date, t0.trade_time,
 			row_number() over(
 				PARTITION by t0.strategy, t0.security_type, t0.code 
 				order by (t0.trade_date + t0.trade_time), t0.id
 			) as rid
 		from dealer.trades t0
 		where t0.trade_date <= in_date
+			and t0.trade_date > (select COALESCE(max(tt0.tdate), '1990-01-01'::date) from ctePosition tt0)
 
 	), cteStockSum as(
 		select 

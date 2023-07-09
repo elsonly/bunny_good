@@ -8,6 +8,6 @@ SELECT add_job(
     timezone => 'Asia/Taipei'
 );
 
-CALL run_job(1014);
+CALL run_job(1013);
 -- select * from cmoney.calendar where tdate >= CURRENT_DATE order by tdate limit 100;
 -- truncate table cmoney.calendar;
