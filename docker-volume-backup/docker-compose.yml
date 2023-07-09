@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  backup:
+    image: offen/docker-volume-backup:v2
+    restart: always
+    env_file: ./backup.env # see below for configuration reference
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - mongo_mongodb:/backup/mongodb:ro
+      - timescaledb_timescaledb:/backup/timescaledb:ro
+      # If you mount a local directory or volume to `/archive` a local
+      # copy of the backup will be stored there. You can override the
+      # location inside of the container by setting `BACKUP_ARCHIVE`.
+      # You can omit this if you do not want to keep local backups.
+      - /d/docker_backup:/archive
+volumes:
+  mongo_mongodb:
+    external: true 
+  timescaledb_timescaledb:
+    external: true

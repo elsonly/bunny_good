@@ -16,6 +16,18 @@ up-airflow:
 down-airflow:
 	docker-compose -f airflow/docker-compose.yml down
 
+up-mongo:
+	docker-compose -f mongo/docker-compose.yml up -d
+
+down-mongo:
+	docker-compose -f mongo/docker-compose.yml down
+
+up-backup:
+	docker-compose -f docker-volume-backup/docker-compose.yml up -d
+
+down-backup:
+	docker-compose -f docker-volume-backup/docker-compose.yml down
+
 image-base:
 	docker build -f Dockerfile.base -t bunny_good:base .
 
