@@ -5,7 +5,7 @@ CREATE or replace function dealer.ft_get_positions_fifo(
 	in_date date,
 	in_action char(1), 	-- B: long position, 
 						-- S: short position
-	is_concat boolean default true
+	is_concat boolean default false
 )
 returns table(
 	tdate date,
@@ -20,6 +20,7 @@ returns table(
 )
 /*
 	select * from dealer.ft_get_positions_fifo(CURRENT_DATE, 'B');
+	select * from dealer.ft_get_positions_fifo(CURRENT_DATE, 'S');
 	select * from dealer.ft_get_positions_fifo(CURRENT_DATE, 'B', true);
 */
 
