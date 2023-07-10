@@ -16,5 +16,7 @@ CREATE TABLE accountdb.dealer.strategy(
     exit_stop_loss double precision,
     exit_take_profit double precision,
     exit_dp_days int,
-    exit_dp_profit_limit double precision
+    exit_dp_profit_limit double precision,
+    exit_profit_pullback_ratio double precision,
+    exit_profit_pullback_threshold double precision
 );
